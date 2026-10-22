@@ -36,6 +36,11 @@ appsettings.Production.json
 *.njsproj
 *.sln.iml
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
 # OS Generated
 Thumbs.db
 ehthumbs.db
