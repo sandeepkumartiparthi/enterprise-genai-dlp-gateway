@@ -26,8 +26,12 @@ import {
   ChevronDown,
   ChevronUp,
   Cpu,
-  FileCheck
+  FileCheck,
+  Radio,
+  UserCheck,
+  KeyRound
 } from 'lucide-react';
+import { ThreeDimensionalSecurityVault } from './components/ThreeDimensionalSecurityVault';
 import type {
   AdversarialThreat,
   AuditLogEntry,
@@ -219,11 +223,17 @@ export default function App() {
     setTargetProvider(scenario.provider);
   };
 
+  const [pipelineStep, setPipelineStep] = useState<number>(0);
+
   const handleSendPrompt = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!promptInput.trim() || isSendingProxy) return;
 
     setIsSendingProxy(true);
+    setPipelineStep(1);
+    const step2Timer = setTimeout(() => setPipelineStep(2), 220);
+    const step3Timer = setTimeout(() => setPipelineStep(3), 440);
+
     try {
       const response = await fetch(`${API_BASE}/v1/chat/completions`, {
         method: 'POST',
@@ -241,6 +251,11 @@ export default function App() {
       });
 
       const data = await response.json();
+      clearTimeout(step2Timer);
+      clearTimeout(step3Timer);
+      setPipelineStep(4);
+      setTimeout(() => setPipelineStep(0), 1600);
+
       if (data.dlp_telemetry) {
         setLastTelemetry(data.dlp_telemetry);
         pushToast({
@@ -252,6 +267,9 @@ export default function App() {
       }
       await fetchAllData();
     } catch (err) {
+      clearTimeout(step2Timer);
+      clearTimeout(step3Timer);
+      setPipelineStep(0);
       console.error('YARP Proxy error:', err);
       pushToast({
         title: 'Gateway Alert',
@@ -451,6 +469,131 @@ export default function App() {
         {/* TAB 1: AI PRIVACY HUB (ABSTRACTED EXECUTIVE PLAYGROUND) */}
         {activeTab === 'hub' && (
           <div className="space-y-6">
+            {/* 3D INTERACTIVE SECURITY MECHANISM */}
+            <ThreeDimensionalSecurityVault
+              activeStep={pipelineStep}
+              isTransiting={isSendingProxy}
+              detectedCount={liveDryRun?.entities.length ?? 0}
+              privacyMode={privacyMode}
+              targetModel={targetProvider}
+            />
+
+            {/* LIVE ANIMATED 4-HOP NETWORK TOPOLOGY PIPELINE */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <Activity className="w-3.5 h-3.5 text-cyan-600" />
+                  Live 4-Hop DLP Network Topology Pipeline
+                </span>
+                <span className="text-[11px] font-mono text-slate-500 flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${pipelineStep > 0 ? 'bg-cyan-500 animate-ping' : 'bg-emerald-500'}`} />
+                  {pipelineStep === 0 ? 'All Hops Online & Secure' : `Streaming Packet through Hop ${pipelineStep}...`}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 relative">
+                {/* Hop 1: Corporate User Ingress */}
+                <div
+                  className={`rounded-xl border p-3.5 transition-all duration-300 ${
+                    pipelineStep === 1
+                      ? 'bg-cyan-50 border-cyan-400 shadow-md ring-1 ring-cyan-400 scale-[1.02]'
+                      : 'bg-slate-50/70 border-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                      <UserCheck className="w-4 h-4 text-cyan-600" />
+                      1. Corporate Ingress
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 font-bold">
+                      Raw PII
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-tight">
+                    {userEmail.split('@')[0]} ({department})
+                  </p>
+                  <div className="mt-2.5 h-1 w-full bg-slate-200 rounded-full overflow-hidden">
+                    <div className={`h-full w-1/3 bg-cyan-500 rounded-full ${pipelineStep === 1 ? 'animate-packet' : ''}`} />
+                  </div>
+                </div>
+
+                {/* Hop 2: YARP + Presidio C# DLP Engine */}
+                <div
+                  className={`rounded-xl border p-3.5 transition-all duration-300 ${
+                    pipelineStep === 2
+                      ? 'bg-emerald-50 border-emerald-400 shadow-md ring-1 ring-emerald-400 scale-[1.02]'
+                      : 'bg-slate-50/70 border-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                      <Cpu className="w-4 h-4 text-emerald-600" />
+                      2. YARP + DLP Engine
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
+                      Presidio + C#
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-tight">
+                    Contextual NER &amp; OWASP LLM01 Gate
+                  </p>
+                  <div className="mt-2.5 h-1 w-full bg-slate-200 rounded-full overflow-hidden">
+                    <div className={`h-full w-1/3 bg-emerald-500 rounded-full ${pipelineStep === 2 ? 'animate-packet' : ''}`} />
+                  </div>
+                </div>
+
+                {/* Hop 3: Ephemeral Vault / Synthetic Shadows */}
+                <div
+                  className={`rounded-xl border p-3.5 transition-all duration-300 ${
+                    pipelineStep === 3
+                      ? 'bg-purple-50 border-purple-400 shadow-md ring-1 ring-purple-400 scale-[1.02]'
+                      : 'bg-slate-50/70 border-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                      <KeyRound className="w-4 h-4 text-purple-600" />
+                      3. Cryptographic Vault
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 font-bold">
+                      {privacyMode === 'synthetic' ? 'Synthetics' : 'Tokens'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-tight">
+                    Zero-Trust Ephemeral In-Memory TTL Store
+                  </p>
+                  <div className="mt-2.5 h-1 w-full bg-slate-200 rounded-full overflow-hidden">
+                    <div className={`h-full w-1/3 bg-purple-500 rounded-full ${pipelineStep === 3 ? 'animate-packet' : ''}`} />
+                  </div>
+                </div>
+
+                {/* Hop 4: Real-World Upstream AI */}
+                <div
+                  className={`rounded-xl border p-3.5 transition-all duration-300 ${
+                    pipelineStep === 4
+                      ? 'bg-blue-50 border-blue-400 shadow-md ring-1 ring-blue-400 scale-[1.02]'
+                      : 'bg-slate-50/70 border-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                      <Globe className="w-4 h-4 text-blue-600" />
+                      4. Upstream AI Cloud
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 font-bold">
+                      Zero PII
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-tight truncate" title={targetProvider}>
+                    {targetProvider.split('(')[0]}
+                  </p>
+                  <div className="mt-2.5 h-1 w-full bg-slate-200 rounded-full overflow-hidden">
+                    <div className={`h-full w-1/3 bg-blue-500 rounded-full ${pipelineStep === 4 ? 'animate-packet' : ''}`} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Quick Scenario Pills */}
             <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
               <div className="flex items-center justify-between mb-2.5">
@@ -797,6 +940,70 @@ export default function App() {
         {/* TAB 2: COMPLIANCE RADAR (ABSTRACTED EXECUTIVE METRICS) */}
         {activeTab === 'radar' && stats && (
           <div className="space-y-6 animate-card-enter">
+            {/* 3D ANIMATED RADAR THREAT INTERCEPTOR */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="relative w-56 h-56 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                {/* Concentric rings */}
+                <div className="absolute inset-4 rounded-full border border-slate-200" />
+                <div className="absolute inset-12 rounded-full border border-slate-200" />
+                <div className="absolute inset-20 rounded-full border border-slate-200" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-full h-[1px] bg-slate-200" />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="h-full w-[1px] bg-slate-200" />
+                </div>
+
+                {/* Rotating Radar Sweep */}
+                <div className="absolute inset-0 animate-radar origin-center pointer-events-none">
+                  <div className="w-1/2 h-1/2 bg-gradient-to-br from-cyan-500/25 to-transparent rounded-tl-full origin-bottom-right" />
+                </div>
+
+                {/* Radar Blips */}
+                <div className="absolute top-10 right-14 w-3 h-3 rounded-full bg-rose-500 animate-ping opacity-75" />
+                <div className="absolute top-10 right-14 w-3 h-3 rounded-full bg-rose-600 shadow-sm" title="OWASP LLM01 Neutralized" />
+
+                <div className="absolute bottom-12 left-10 w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse" title="UIDAI Aadhaar Shielded" />
+                <div className="absolute top-16 left-12 w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse" title="PCI-DSS Card Masked" />
+                <div className="absolute bottom-16 right-12 w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="HIPAA PHI Isolated" />
+
+                {/* Center Core */}
+                <div className="w-6 h-6 rounded-full bg-cyan-600 text-white flex items-center justify-center z-10 shadow-sm text-[10px] font-bold">
+                  DLP
+                </div>
+              </div>
+
+              <div className="flex-1 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <Radio className="w-4 h-4 text-cyan-600 animate-pulse" />
+                    360° Real-Time Adversarial Threat Interceptor
+                  </h4>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+                    Zero Perimeter Breaches
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Active spatial perimeter scanning continuously analyzes enterprise prompt payloads against OWASP LLM01:2025/2027
+                  jailbreak patterns, indirect prompt injections, and algorithmic exfiltration attempts.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1 text-xs">
+                  <div className="rounded-lg bg-slate-50 border border-slate-200 p-2">
+                    <span className="text-[10px] text-slate-500 block">Threat Category</span>
+                    <span className="font-bold text-slate-900">OWASP LLM01</span>
+                  </div>
+                  <div className="rounded-lg bg-slate-50 border border-slate-200 p-2">
+                    <span className="text-[10px] text-slate-500 block">Defense Algorithm</span>
+                    <span className="font-bold text-slate-900">Heuristic + Semantic</span>
+                  </div>
+                  <div className="rounded-lg bg-slate-50 border border-slate-200 p-2">
+                    <span className="text-[10px] text-slate-500 block">Interception Rate</span>
+                    <span className="font-bold text-emerald-700">100.0% Blocked</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* KPI Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">

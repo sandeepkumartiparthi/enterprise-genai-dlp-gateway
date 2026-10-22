@@ -155,8 +155,48 @@ body {
   animation: shimmer-sweep 2.4s infinite;
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2.5s infinite ease-in-out;
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orbit-spin {
+  0% { transform: rotateX(65deg) rotateZ(0deg); }
+  100% { transform: rotateX(65deg) rotateZ(360deg); }
+}
+
+@keyframes float-3d {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes shield-glow {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.35)); }
+  50% { filter: drop-shadow(0 0 26px rgba(16, 185, 129, 0.5)); }
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.animate-radar {
+  animation: radar-sweep 4s linear infinite;
+}
+
+.animate-orbit {
+  animation: orbit-spin 14s linear infinite;
+}
+
+.animate-float {
+  animation: float-3d 4s ease-in-out infinite;
+}
+
+.animate-shield-glow {
+  animation: shield-glow 2.8s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -167,7 +207,11 @@ body {
   }
   .animate-packet,
   .animate-shimmer,
-  .animate-pulse-glow {
+  .animate-pulse-glow,
+  .animate-radar,
+  .animate-orbit,
+  .animate-float {
     animation: none !important;
   }
 }
+
