@@ -1067,93 +1067,105 @@ export default function App() {
         ))}
       </div>
 
-      {/* EXECUTIVE HEADER: TWO-TIER ENTERPRISE ARCHITECTURE (GOOGLE DESIGN - NO BLACK HIGHLIGHTS, NO BLACK TOOLTIPS) */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs overflow-x-hidden">
+      {/* EXECUTIVE HEADER: TWO-TIER ENTERPRISE ARCHITECTURE (PRESTIGE GOOGLE & STRIPE DESIGN) */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_1px_3px_0_rgba(0,0,0,0.03),0_1px_2px_-1px_rgba(0,0,0,0.02)] overflow-x-hidden">
+        {/* Top Micro-Glow Accent Line */}
+        <div className="h-[2.5px] w-full bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 opacity-90" />
+
         {/* TIER 1: BRAND IDENTITY, TOPOLOGY, RBAC & SOC TOOLS */}
-        <div className="border-b border-slate-100">
+        <div className="border-b border-slate-200/60">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-15 flex items-center justify-between gap-4 overflow-hidden">
             {/* Left: Brand & Regional Cloud Topology */}
             <div className="flex items-center gap-3.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 via-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-xs ring-1 ring-cyan-500/20 shrink-0">
-                <ShieldCheck className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 via-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-xs ring-1 ring-cyan-500/30 shrink-0">
+                <ShieldCheck className="w-5 h-5 text-white drop-shadow-xs" />
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <h1
                     ref={mainHeadingRef}
-                    className="text-base font-bold text-slate-900 tracking-tight"
+                    className="text-[17px] font-extrabold text-slate-900 tracking-tight flex items-center gap-1"
                   >
-                    AegisDLP
+                    <span>Aegis</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 font-black">DLP</span>
                   </h1>
                   <span
-                    className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200/80"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs"
                   >
-                    2027 Production
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    v2.7 Enterprise
                   </span>
                 </div>
 
                 {/* Regional Indian Cloud Cluster Badge */}
                 <div
-                  className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200/80 text-[11px] font-medium text-slate-600"
+                  className="hidden md:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100/80 border border-slate-200/80 text-[11px] text-slate-700 font-medium shadow-2xs backdrop-blur-xs"
                 >
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="font-semibold text-slate-800">ap-south-1</span>
-                  <span className="text-slate-400">|</span>
-                  <span>Mumbai Core • 99.99% SLA</span>
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span className="font-mono font-bold text-slate-900">ap-south-1</span>
+                  <span className="text-slate-300 font-light">|</span>
+                  <span className="text-slate-600 font-medium">Mumbai Core</span>
+                  <span className="px-1.5 py-0.2 rounded-md bg-emerald-100/80 text-emerald-800 font-mono text-[9px] font-bold border border-emerald-200/60">99.99% SLA</span>
                 </div>
               </div>
             </div>
 
             {/* Right: RBAC Persona Switcher & Executive Actions */}
             <div className="flex items-center gap-2.5">
-              {/* RBAC Role Selector (Google Blue Active State - No Black Highlights) */}
-              <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200/80 text-xs">
-                <span className="text-[10px] font-bold text-slate-400 uppercase px-2 hidden sm:inline">Role:</span>
+              {/* RBAC Role Selector Segmented Pill */}
+              <div className="flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200/70 shadow-2xs text-xs">
+                <span className="text-[10px] font-bold text-slate-400 uppercase px-2 hidden sm:inline tracking-wider">Role</span>
                 <button
                   type="button"
                   onClick={() => setCurrentUserRole('secops')}
                   title="SecOps Lead: Full admin, policy rules, and webhook controls"
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
                     currentUserRole === 'secops'
-                      ? 'bg-white text-blue-700 shadow-xs border border-blue-200/80'
-                      : 'text-slate-600 hover:text-blue-700'
+                      ? 'bg-white text-blue-700 shadow-xs border border-slate-200/70'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  SecOps Lead
+                  <ShieldCheck className="w-3 h-3 text-cyan-600" />
+                  <span>SecOps Lead</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setCurrentUserRole('compliance')}
                   title="Compliance Auditor: Read-only audits, DPDP Act 2023 conformity proofs"
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
                     currentUserRole === 'compliance'
-                      ? 'bg-white text-blue-700 shadow-xs border border-blue-200/80'
-                      : 'text-slate-600 hover:text-blue-700'
+                      ? 'bg-white text-blue-700 shadow-xs border border-slate-200/70'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  Auditor
+                  <FileCheck className="w-3 h-3 text-purple-600" />
+                  <span>Auditor</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setCurrentUserRole('developer')}
                   title="AI Developer: Playground, P99 latency & surrogate verification"
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
                     currentUserRole === 'developer'
-                      ? 'bg-white text-blue-700 shadow-xs border border-blue-200/80'
-                      : 'text-slate-600 hover:text-blue-700'
+                      ? 'bg-white text-blue-700 shadow-xs border border-slate-200/70'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  Developer
+                  <Terminal className="w-3 h-3 text-blue-600" />
+                  <span>Developer</span>
                 </button>
               </div>
 
               {/* SOC & Incident Management Quick Actions */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleOpenSiemModal}
                   title="Dispatch real-time SIEM alerts to Splunk, Datadog, Sentinel, or Slack"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200/80 bg-white hover:bg-blue-50/70 hover:border-blue-200 text-slate-700 hover:text-blue-700 text-xs font-semibold shadow-2xs transition cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 hover:border-cyan-300 text-slate-700 hover:text-cyan-700 text-xs font-semibold shadow-2xs hover:shadow-xs transition cursor-pointer"
                 >
                   <Bell className="w-3.5 h-3.5 text-cyan-600" />
                   <span className="hidden sm:inline">SIEM Webhooks</span>
@@ -1163,7 +1175,7 @@ export default function App() {
                   type="button"
                   onClick={handleExportComplianceDossier}
                   title="Export DPDP Act 2023 & ISO/IEC 42001 Compliance Dossier"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200/80 bg-white hover:bg-purple-50/70 hover:border-purple-200 text-slate-700 hover:text-purple-700 text-xs font-semibold shadow-2xs transition cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-purple-200/80 bg-purple-50/40 hover:bg-purple-50 hover:border-purple-300 text-purple-700 text-xs font-bold shadow-2xs hover:shadow-xs transition cursor-pointer"
                 >
                   <FileText className="w-3.5 h-3.5 text-purple-600" />
                   <span className="hidden sm:inline">Dossier</span>
@@ -1173,20 +1185,20 @@ export default function App() {
           </div>
         </div>
 
-        {/* TIER 2: 5 PRIMARY NAVIGATION TABS (GOOGLE BLUE PILL, ZERO BLACK HIGHLIGHT, NO HOVER COMMENTS) */}
+        {/* TIER 2: 5 PRIMARY NAVIGATION TABS (COHESIVE SEGMENTED TRACK) & ACTIVE SECURITY TELEMETRY */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between gap-4 overflow-hidden">
-          {/* Left: Perfectly aligned segmented Navigation Tabs (No sideways scroll, no black comments) */}
-          <nav className="flex items-center gap-1.5 py-1 shrink-0 overflow-visible">
+          {/* Left: Perfectly aligned Segmented Navigation Track */}
+          <nav className="flex items-center p-1 bg-slate-100/90 rounded-2xl border border-slate-200/80 shadow-2xs shrink-0 overflow-visible">
             <button
               type="button"
               onClick={() => setActiveTab('hub')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'hub'
-                  ? 'bg-blue-600 text-white shadow-xs shadow-blue-500/25 ring-1 ring-blue-700/20'
-                  : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50/80'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs font-bold ring-1 ring-blue-700/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/70'
               }`}
             >
-              <Zap className={`w-3.5 h-3.5 ${activeTab === 'hub' ? 'text-white' : 'text-blue-600'}`} />
+              <Zap className={`w-3.5 h-3.5 ${activeTab === 'hub' ? 'text-white' : 'text-cyan-600'}`} />
               <span>AI Privacy Hub</span>
             </button>
 
@@ -1195,8 +1207,8 @@ export default function App() {
               onClick={() => setActiveTab('policies')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'policies'
-                  ? 'bg-blue-600 text-white shadow-xs shadow-blue-500/25 ring-1 ring-blue-700/20'
-                  : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50/80'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs font-bold ring-1 ring-blue-700/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/70'
               }`}
             >
               <Sliders className={`w-3.5 h-3.5 ${activeTab === 'policies' ? 'text-white' : 'text-indigo-600'}`} />
@@ -1205,7 +1217,7 @@ export default function App() {
                 <span
                   className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full font-bold ${
                     activeTab === 'policies'
-                      ? 'bg-blue-700 text-white'
+                      ? 'bg-white/20 text-white'
                       : 'bg-slate-200 text-slate-700'
                   }`}
                 >
@@ -1219,8 +1231,8 @@ export default function App() {
               onClick={() => setActiveTab('radar')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'radar'
-                  ? 'bg-blue-600 text-white shadow-xs shadow-blue-500/25 ring-1 ring-blue-700/20'
-                  : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50/80'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs font-bold ring-1 ring-blue-700/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/70'
               }`}
             >
               <Activity className={`w-3.5 h-3.5 ${activeTab === 'radar' ? 'text-white' : 'text-blue-600'}`} />
@@ -1235,8 +1247,8 @@ export default function App() {
               }}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'finops'
-                  ? 'bg-blue-600 text-white shadow-xs shadow-blue-500/25 ring-1 ring-blue-700/20'
-                  : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50/80'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs font-bold ring-1 ring-blue-700/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/70'
               }`}
             >
               <Coins className={`w-3.5 h-3.5 ${activeTab === 'finops' ? 'text-white' : 'text-amber-500'}`} />
@@ -1248,8 +1260,8 @@ export default function App() {
               onClick={() => setActiveTab('ledger')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'ledger'
-                  ? 'bg-blue-600 text-white shadow-xs shadow-blue-500/25 ring-1 ring-blue-700/20'
-                  : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50/80'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs font-bold ring-1 ring-blue-700/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/70'
               }`}
             >
               <Lock className={`w-3.5 h-3.5 ${activeTab === 'ledger' ? 'text-white' : 'text-emerald-600'}`} />
@@ -1258,23 +1270,25 @@ export default function App() {
           </nav>
 
           {/* Right: Active Mode & Regulatory Security Chip */}
-          <div className="hidden lg:flex items-center gap-2 text-xs shrink-0">
-            <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold border ${
+          <div className="hidden lg:flex items-center gap-2.5 text-xs shrink-0">
+            <div
+              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border shadow-2xs transition ${
                 privacyMode === 'synthetic'
-                  ? 'bg-purple-50 text-purple-700 border-purple-200'
-                  : 'bg-blue-50 text-blue-700 border-blue-200'
+                  ? 'bg-purple-50/80 text-purple-800 border-purple-200/90'
+                  : 'bg-blue-50/80 text-blue-800 border-blue-200/90'
               }`}
             >
-              {privacyMode === 'synthetic' ? '✨ Synthetic Shadows (Indian Personas)' : '🔒 Token Vault ([UUID])'}
-            </span>
+              <span className={`w-2 h-2 rounded-full ${privacyMode === 'synthetic' ? 'bg-purple-600' : 'bg-blue-600'} animate-pulse`} />
+              <span className="font-mono text-[10px] font-bold text-slate-400 uppercase">Mode:</span>
+              <span className="font-mono text-[11px] font-bold">
+                {privacyMode === 'synthetic' ? '✨ Synthetic Shadows (Indian Personas)' : '🔒 Token Vault ([UUID])'}
+              </span>
+            </div>
 
-            <span
-              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold"
-            >
-              <Check className="w-3 h-3 text-emerald-600" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50/80 border border-emerald-200/90 text-emerald-800 text-xs font-bold shadow-2xs">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               <span>DPDP 2023 Validated</span>
-            </span>
+            </div>
           </div>
         </div>
       </header>
