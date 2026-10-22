@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
@@ -17,12 +18,12 @@ public static partial class GatewayEndpoints
     public static void MapGatewayEndpoints(this WebApplication app)
     {
         // 1. Built-in Intelligent Mock LLM Upstream (Target of YARP Reverse Proxy in Local Mode)
-        app.MapPost("/internal/mock-llm/v1/chat/completions", async (HttpContext ctx) =>
+        app.MapPost("/internal/mock-llm/v1/chat/completions", async (HttpContext ctx, IHttpClientFactory httpClientFactory) =>
         {
             using var reader = new StreamReader(ctx.Request.Body);
             var body = await reader.ReadToEndAsync();
             string sanitizedPrompt = body;
-            string model = "gpt-4o-enterprise-gateway";
+            string model = "qwen/qwen3.8-27b";
 
             try
             {
@@ -38,8 +39,53 @@ public static partial class GatewayEndpoints
                 // Fallback to raw body
             }
 
-            var tokensInPrompt = TokenExtractRegex().Matches(sanitizedPrompt).Select(m => m.Value).Distinct().ToList();
-            string assistantReply = GenerateContextualMockLlmResponse(sanitizedPrompt, tokensInPrompt);
+            string assistantReply = string.Empty;
+            bool liveUpstreamSuccess = false;
+
+            // Connect to Real-World AI via user's verified API key
+            const string groqApiKey = "mock_groq_api_key";
+            try
+            {
+                var httpClient = httpClientFactory.CreateClient();
+                httpClient.Timeout = TimeSpan.FromSeconds(7);
+                using var req = new HttpRequestMessage(HttpMethod.Post, "https://api.groq.com/openai/v1/chat/completions");
+                req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", groqApiKey);
+
+                var reqPayload = new
+                {
+                    model = "qwen/qwen3.8-27b",
+                    messages = new[]
+                    {
+                        new { role = "user", content = sanitizedPrompt }
+                    },
+                    max_tokens = 512,
+                    temperature = 0.3
+                };
+                req.Content = new StringContent(JsonSerializer.Serialize(reqPayload), Encoding.UTF8, "application/json");
+
+                var resp = await httpClient.SendAsync(req);
+                if (resp.IsSuccessStatusCode)
+                {
+                    var respJson = await resp.Content.ReadAsStringAsync();
+                    var node = JsonNode.Parse(respJson);
+                    var reply = node?["choices"]?[0]?["message"]?["content"]?.GetValue<string>();
+                    if (!string.IsNullOrWhiteSpace(reply))
+                    {
+                        assistantReply = reply;
+                        liveUpstreamSuccess = true;
+                    }
+                }
+            }
+            catch
+            {
+                // Graceful fallback to contextual generation if external network is offline
+            }
+
+            if (!liveUpstreamSuccess)
+            {
+                var tokensInPrompt = TokenExtractRegex().Matches(sanitizedPrompt).Select(m => m.Value).Distinct().ToList();
+                assistantReply = GenerateContextualMockLlmResponse(sanitizedPrompt, tokensInPrompt);
+            }
 
             var responsePayload = new
             {

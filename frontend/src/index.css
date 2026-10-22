@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
 @property --animation-reduced {
   syntax: "*";
   inherits: false;
@@ -32,7 +44,7 @@
   }
 
   dialog::backdrop {
-    background: rgba(2, 6, 23, 0);
+    background: rgba(15, 23, 42, 0);
     backdrop-filter: blur(0px);
     transition:
       background 0.25s ease-out,
@@ -42,13 +54,13 @@
   }
 
   dialog[open]::backdrop {
-    background: rgba(2, 6, 23, 0.78);
-    backdrop-filter: blur(6px);
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(5px);
   }
 
   @starting-style {
     dialog[open]::backdrop {
-      background: rgba(2, 6, 23, 0);
+      background: rgba(15, 23, 42, 0);
       backdrop-filter: blur(0px);
     }
   }

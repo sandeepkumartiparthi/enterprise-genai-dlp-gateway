@@ -111,7 +111,7 @@ public class DlpEngineService : IDlpEngineService
             "SOURCE_CODE",
             "Proprietary Source Code / Keys",
             "SourceCode",
-            new Regex(@"(?:-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----|namespace\s+[A-Z][A-Za-z0-9_.]+(?:\.Internal|\.Proprietary|\.CoreBilling)[A-Za-z0-9_.]*|public\s+(?:sealed\s+|abstract\s+)?(?:class|interface|record|struct)\s+[A-Z][A-Za-z0-9_]+|Server\s*=\s*[^;]+;\s*Database\s*=\s*[^;]+;\s*User\s*Id\s*=\s*[^;]+;)", RegexOptions.Compiled),
+            new Regex(@"(?:-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----|namespace\s+[A-Z][A-Za-z0-9_.]+(?:\.Internal|\.Proprietary|\.CoreBilling)[A-Za-z0-9_.]*|Server\s*=\s*[^;]+;\s*Database\s*=\s*[^;]+;\s*User\s*Id\s*=\s*[^;]+;)", RegexOptions.Compiled),
             0.94,
             "AST & Entropy Code Guard"),
 
@@ -135,7 +135,7 @@ public class DlpEngineService : IDlpEngineService
             "PHONE_NUMBER",
             "Phone Number",
             "PII",
-            new Regex(@"(?:\+\d{1,3}[\s\-]?)?(?:\(\d{3}\)|\b\d{3})[\s.\-]\d{3}[\s.\-]\d{4}\b|\+91[\s\-]?[6-9](?:\d{4}[\s\-]?\d{5}|\d{9})\b", RegexOptions.Compiled),
+            new Regex(@"(?:\+\d{1,3}[\s\-]?)?(?:\(\d{3}\)|\b\d{3})[\s.\-]\d{3}[\s.\-]\d{4}\b|\+91[\s\-]?[6-9]\d{9}\b", RegexOptions.Compiled),
             0.86,
             "Presidio PHONE_NUMBER"),
 
@@ -143,7 +143,7 @@ public class DlpEngineService : IDlpEngineService
             "PERSON",
             "Person Full Name (NER)",
             "PII",
-            new Regex(@"(?<=\b(?:Patient|Customer|Client|Employee|Applicant|Holder|User|Dr\.|Mr\.|Ms\.|Mrs\.|Name|contact)\s*:?\s+)((?!(?:Customer|Patient|Client|Employee|Applicant|Holder|User)\b)[A-Z][a-z]{2,15}(?:\s+[A-Z][a-z]{2,15}){1,2})", RegexOptions.Compiled),
+            new Regex(@"(?<=\b(?:Patient|Customer|Client|Employee|Applicant|Holder|User|Dr\.|Mr\.|Ms\.|Mrs\.|Name|for|contact)\s*:?\s+)((?!(?:Customer|Patient|Client|Employee|Applicant|Holder|User)\b)[A-Z][a-z]{2,15}(?:\s+[A-Z][a-z]{2,15}){1,2})", RegexOptions.Compiled),
             0.88,
             "Contextual NER (PERSON)",
             1)

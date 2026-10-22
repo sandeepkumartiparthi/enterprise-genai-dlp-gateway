@@ -36,7 +36,7 @@ public partial class TokenVaultService : ITokenVaultService
     private readonly TimeSpan _defaultTtl;
     private readonly string _storageMode;
 
-    [GeneratedRegex(@"\[([A-Za-z0-9_]+_[A-Za-z0-9]{4,8})\]", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+    [GeneratedRegex(@"\[([A-Z0-9_]+_[A-F0-9]{4,8})\]", RegexOptions.Compiled)]
     private static partial Regex TokenPlaceholderRegex();
 
     public TokenVaultService(
@@ -206,9 +206,7 @@ public partial class TokenVaultService : ITokenVaultService
 
                 if (entry != null && entry.ExpiresAtUtc > DateTime.UtcNow)
                 {
-                    var tokenRegex = new Regex(Regex.Escape(token), RegexOptions.IgnoreCase);
-                    var updated = tokenRegex.Replace(resultBuilder.ToString(), entry.OriginalValue);
-                    resultBuilder.Clear().Append(updated);
+                    resultBuilder.Replace(token, entry.OriginalValue);
                     entry.RestoredCount++;
                     restoredCount++;
                 }
