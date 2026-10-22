@@ -1068,10 +1068,10 @@ export default function App() {
       </div>
 
       {/* EXECUTIVE HEADER: TWO-TIER ENTERPRISE ARCHITECTURE */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs overflow-x-hidden">
         {/* TIER 1: BRAND IDENTITY, TOPOLOGY, RBAC & SOC TOOLS */}
         <div className="border-b border-slate-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-15 flex items-center justify-between gap-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-15 flex items-center justify-between gap-4 overflow-hidden">
             {/* Left: Brand & Regional Cloud Topology */}
             <div className="flex items-center gap-3.5">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 via-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-xs ring-1 ring-cyan-500/20 shrink-0">
@@ -1182,9 +1182,9 @@ export default function App() {
         </div>
 
         {/* TIER 2: 5 PRIMARY NAVIGATION TABS & ACTIVE HORIZON TELEMETRY */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between gap-4">
-          {/* Left: Perfectly aligned segmented Navigation Tabs */}
-          <nav className="flex items-center gap-1.5 overflow-x-auto py-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between gap-4 overflow-hidden">
+          {/* Left: Perfectly aligned segmented Navigation Tabs (No sideways scroll) */}
+          <nav className="flex items-center gap-1.5 py-1 shrink-0 overflow-visible">
             <button
               type="button"
               onClick={() => setActiveTab('hub')}
@@ -1291,7 +1291,7 @@ export default function App() {
           </nav>
 
           {/* Right: Active Mode & Regulatory Security Chip */}
-          <div className="hidden md:flex items-center gap-2 text-xs">
+          <div className="hidden lg:flex items-center gap-2 text-xs shrink-0">
             <span
               className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold border ${
                 privacyMode === 'synthetic'
