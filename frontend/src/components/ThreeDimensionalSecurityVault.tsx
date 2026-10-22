@@ -18,6 +18,45 @@ interface StreamParticle {
   tailLength: number;
 }
 
+const STATION_PODS_INFO = [
+  {
+    step: 1,
+    pct: 0.13,
+    name: 'Client Ingress Pod',
+    role: 'Corporate Terminal Endpoint',
+    badge: 'RAW PII INGESTION',
+    color: '#0891b2',
+    desc: 'Ingests employee queries, authenticates JWT sessions, and streams raw tokens to DLP perimeter.',
+  },
+  {
+    step: 2,
+    pct: 0.38,
+    name: 'DLP NER Guard Pod',
+    role: 'Presidio + High-Speed C# AST',
+    badge: 'ACTIVE LASER SCANNER',
+    color: '#059669',
+    desc: 'Deep multi-pass entity extraction: Aadhaar, SSN, Credit Cards, HIPAA PHI & OWASP LLM01 injections in <4ms.',
+  },
+  {
+    step: 3,
+    pct: 0.63,
+    name: 'Cryptographic Vault Pod',
+    role: 'Surrogate Generation & Token Chamber',
+    badge: 'ZERO-TRUST ISOLATION',
+    color: '#7c3aed',
+    desc: 'Encapsulates true identifiers in an ephemeral in-memory vault with cryptographic hash receipts.',
+  },
+  {
+    step: 4,
+    pct: 0.87,
+    name: 'AI Cloud Upstream Pod',
+    role: 'Target Model Inference',
+    badge: '100% SANITIZED EGRESS',
+    color: '#2563eb',
+    desc: 'Google Gemini & Groq Cloud upstream inference receiving zero plaintext customer records.',
+  },
+];
+
 export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = ({
   activeStep,
   isTransiting,
@@ -27,7 +66,37 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [hoveredStation, setHoveredStation] = useState<string | null>(null);
+  const [hoveredStationData, setHoveredStationData] = useState<typeof STATION_PODS_INFO[0] | null>(null);
   const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const width = rect.width;
+    const height = rect.height;
+    const cy = height / 2;
+
+    const hovered = STATION_PODS_INFO.find((st) => {
+      const sx = width * st.pct;
+      const dist = Math.hypot(x - sx, y - cy);
+      return dist < 45;
+    });
+
+    if (hovered) {
+      setHoveredStation(hovered.name);
+      setHoveredStationData(hovered);
+      setMousePos({ x, y });
+    } else {
+      setHoveredStation(null);
+      setHoveredStationData(null);
+    }
+  };
+
+  const handleCanvasMouseLeave = () => {
+    setHoveredStation(null);
+    setHoveredStationData(null);
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -359,8 +428,36 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
       >
         <canvas
           ref={canvasRef}
-          className="w-full h-full block"
+          onMouseMove={handleCanvasMouseMove}
+          onMouseLeave={handleCanvasMouseLeave}
+          className="w-full h-full block cursor-crosshair"
         />
+
+        {/* Floating Station Hover Popup */}
+        {hoveredStationData && (
+          <div
+            className="absolute z-40 pointer-events-none p-3 rounded-xl bg-slate-900/95 text-white border border-slate-700 shadow-2xl backdrop-blur-md text-xs animate-card-enter max-w-xs"
+            style={{
+              left: Math.max(10, Math.min(mousePos.x - 120, 260)),
+              top: Math.max(10, mousePos.y - 105),
+            }}
+          >
+            <div className="flex items-center justify-between gap-2 mb-1 border-b border-slate-800 pb-1.5">
+              <div className="flex items-center gap-1.5 font-bold">
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: hoveredStationData.color }} />
+                <span>{hoveredStationData.name}</span>
+              </div>
+              <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-slate-800 text-cyan-300 border border-slate-700">
+                {hoveredStationData.badge}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-300 leading-snug">{hoveredStationData.desc}</p>
+            <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mt-1.5 pt-1 border-t border-slate-800">
+              <span>{hoveredStationData.role}</span>
+              <span className="text-emerald-400 font-semibold">Hop #{hoveredStationData.step}</span>
+            </div>
+          </div>
+        )}
 
         {/* Top Graphic Header Badge */}
         <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-2 px-3 py-1 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200 text-xs font-bold text-slate-800 shadow-xs">
@@ -409,7 +506,7 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-2 gap-2.5">
-          <div className="rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5">
+          <div className="executive-tooltip tooltip-bottom rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5 cursor-help" data-tooltip="Format-Preserving Synthetic Shadows (natural grammar) vs Ephemeral UUID Tokens">
             <span className="text-[10px] uppercase font-mono text-slate-500 block">DLP Mode</span>
             <span className="text-xs font-bold text-slate-900 flex items-center gap-1 mt-0.5">
               {privacyMode === 'synthetic' ? (
@@ -424,14 +521,14 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
             </span>
           </div>
 
-          <div className="rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5">
+          <div className="executive-tooltip tooltip-bottom rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5 cursor-help" data-tooltip="Active Upstream LLM Target routed via Microsoft YARP reverse proxy">
             <span className="text-[10px] uppercase font-mono text-slate-500 block">Upstream AI</span>
             <span className="text-xs font-bold text-slate-900 truncate block mt-0.5" title={targetModel}>
               {targetModel.includes('Gemini') ? 'Google Gemini' : 'Groq Cloud'}
             </span>
           </div>
 
-          <div className="rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5">
+          <div className="executive-tooltip tooltip-bottom rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5 cursor-help" data-tooltip="Real-time multi-hop transit state of payload through gateway">
             <span className="text-[10px] uppercase font-mono text-slate-500 block">Pipeline Status</span>
             <span
               className={`text-xs font-bold flex items-center gap-1 mt-0.5 ${
@@ -453,7 +550,7 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
             </span>
           </div>
 
-          <div className="rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5">
+          <div className="executive-tooltip tooltip-bottom rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5 cursor-help" data-tooltip="Total sensitive identifiers intercepted, encrypted, and isolated from external models">
             <span className="text-[10px] uppercase font-mono text-slate-500 block">Protected Items</span>
             <span className="text-xs font-bold text-emerald-700 mt-0.5 block">
               {detectedCount > 0 ? `${detectedCount} Encrypted` : '100% Shielded'}

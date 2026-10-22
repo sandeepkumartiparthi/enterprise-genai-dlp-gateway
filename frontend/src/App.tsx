@@ -1042,17 +1042,17 @@ export default function App() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 ref={mainHeadingRef} className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+                <h1 ref={mainHeadingRef} className="text-base sm:text-lg font-bold text-slate-900 tracking-tight executive-tooltip tooltip-bottom" data-tooltip="AegisDLP Enterprise Reverse Proxy Core • Zero Raw PII Egress">
                   AegisDLP
                 </h1>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200 executive-tooltip tooltip-bottom" data-tooltip="2027 Production Gateway • Strict Zero-Trust Enforcement">
                   2027 Production Gateway
                 </span>
               </div>
               <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium">
                 <span className="hidden sm:inline">Zero Raw PII Exposure</span>
                 <span className="hidden sm:inline">•</span>
-                <span className="flex items-center gap-1 text-emerald-700 font-semibold">
+                <span className="flex items-center gap-1 text-emerald-700 font-semibold executive-tooltip tooltip-bottom" data-tooltip="Primary Cluster us-east-1 Active • 99.99% SLA • Hot Standby eu-central-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   us-east-1 (Primary) 99.99% SLA
                 </span>
@@ -1068,36 +1068,39 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setCurrentUserRole('secops')}
-                className={`px-2 py-1 rounded text-[11px] font-bold transition cursor-pointer ${
+                title="SecOps Lead: Full admin, policy rules, and webhook controls"
+                data-tooltip="SecOps Director: Full admin, policy rules, and webhook controls"
+                className={`executive-tooltip tooltip-bottom px-2 py-1 rounded text-[11px] font-bold transition cursor-pointer ${
                   currentUserRole === 'secops'
                     ? 'bg-white text-slate-900 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
-                title="SecOps Lead: Full admin, policy rules, and webhook controls"
               >
                 SecOps Lead
               </button>
               <button
                 type="button"
                 onClick={() => setCurrentUserRole('compliance')}
-                className={`px-2 py-1 rounded text-[11px] font-bold transition cursor-pointer ${
+                title="Compliance Auditor: Read-only audits, EU AI Act conformity proofs"
+                data-tooltip="Compliance Auditor: Read-only audits, EU AI Act conformity proofs"
+                className={`executive-tooltip tooltip-bottom px-2 py-1 rounded text-[11px] font-bold transition cursor-pointer ${
                   currentUserRole === 'compliance'
                     ? 'bg-white text-slate-900 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
-                title="Compliance Auditor: Read-only audits, EU AI Act conformity proofs"
               >
                 Compliance Auditor
               </button>
               <button
                 type="button"
                 onClick={() => setCurrentUserRole('developer')}
-                className={`px-2 py-1 rounded text-[11px] font-bold transition cursor-pointer ${
+                title="AI Developer: Playground, P99 latency & surrogate verification"
+                data-tooltip="AI Developer: Playground, P99 latency & surrogate verification"
+                className={`executive-tooltip tooltip-bottom px-2 py-1 rounded text-[11px] font-bold transition cursor-pointer ${
                   currentUserRole === 'developer'
                     ? 'bg-white text-slate-900 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
-                title="AI Developer: Playground, P99 latency & surrogate verification"
               >
                 Developer
               </button>
@@ -1108,8 +1111,9 @@ export default function App() {
               <button
                 type="button"
                 onClick={handleOpenSiemModal}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer"
                 title="Dispatch real-time SIEM alerts to Splunk, Datadog, Sentinel, or Slack"
+                data-tooltip="Dispatch real-time SIEM alerts to Splunk, Datadog, Sentinel, or Slack"
+                className="executive-tooltip tooltip-bottom inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer"
               >
                 <Bell className="w-3.5 h-3.5 text-cyan-600" />
                 <span>SIEM</span>
@@ -1118,8 +1122,9 @@ export default function App() {
               <button
                 type="button"
                 onClick={handleExportComplianceDossier}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer"
                 title="Export EU AI Act & ISO/IEC 42001 Compliance Dossier"
+                data-tooltip="Export EU AI Act & ISO/IEC 42001 Compliance Dossier"
+                className="executive-tooltip tooltip-bottom inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer"
               >
                 <FileText className="w-3.5 h-3.5 text-purple-600" />
                 <span>Dossier</span>
@@ -1139,7 +1144,7 @@ export default function App() {
               }`}
             >
               <Zap className="w-3.5 h-3.5 text-cyan-600" />
-              <span>AI Privacy Hub</span>
+              <span className="executive-tooltip tooltip-bottom" data-tooltip="Interactive Playground: 4-Hop Pipeline, 2D Flow Highway & Live Payloads">AI Privacy Hub</span>
             </button>
             <button
               type="button"
@@ -1151,7 +1156,7 @@ export default function App() {
               }`}
             >
               <Sliders className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Security Policies</span>
+              <span className="executive-tooltip tooltip-bottom" data-tooltip="Security Guardrails: Configure BLOCK, TOKENIZE, and REDACT actions">Security Policies</span>
               {policies.length > 0 && (
                 <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700 font-bold">
                   {policies.filter((p) => p.enabled).length}
@@ -1168,7 +1173,7 @@ export default function App() {
               }`}
             >
               <Activity className="w-3.5 h-3.5 text-blue-600" />
-              <span>Compliance Radar</span>
+              <span className="executive-tooltip tooltip-bottom" data-tooltip="Real-Time Telemetry: 360° Threat Interceptor, Perimeter Risk Meter & Sparklines">Compliance Radar</span>
             </button>
             <button
               type="button"
@@ -1183,7 +1188,7 @@ export default function App() {
               }`}
             >
               <Coins className="w-3.5 h-3.5 text-amber-500" />
-              <span>FinOps &amp; Quotas</span>
+              <span className="executive-tooltip tooltip-bottom" data-tooltip="FinOps Governance: Department Daily Token Ceilings, Burn Rates & Savings">FinOps &amp; Quotas</span>
             </button>
             <button
               type="button"
@@ -1195,7 +1200,7 @@ export default function App() {
               }`}
             >
               <Lock className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Audit Ledger &amp; Proofs</span>
+              <span className="executive-tooltip tooltip-bottom" data-tooltip="Tamper-Evident Ledger: Cryptographic Proofs & EU AI Act Art. 15 Receipts">Audit Ledger &amp; Proofs</span>
             </button>
           </nav>
         </div>
@@ -1346,8 +1351,9 @@ export default function App() {
                   <button
                     type="button"
                     onClick={handleOpenBatchSuiteModal}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition cursor-pointer shadow-sm"
                     title="Automatically execute all 15 scenarios against the gateway and generate an executive scorecard"
+                    data-tooltip="1-Click Automated Compliance Suite across all 15 industry presets"
+                    className="executive-tooltip tooltip-bottom inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition cursor-pointer shadow-sm"
                   >
                     <PlayCircle className="w-3.5 h-3.5 text-cyan-400" />
                     <span>Run Compliance Suite (15 Scenarios)</span>
@@ -1502,7 +1508,7 @@ export default function App() {
                             ? 'bg-white text-cyan-800 shadow-xs border border-slate-200'
                             : 'text-slate-600 hover:text-slate-900'
                         }`}
-                        title="AI-Native Format-Preserving Synthetic Shadows (Natural grammar, zero raw PII)"
+                        title="AI-Native Format-Preserving Synthetic Shadows (Natural grammar, zero raw PII)" data-tooltip="AI-Native Synthetic Shadows: Replaces PII with realistic grammar-preserving surrogates"
                       >
                         <Sparkles className="w-3.5 h-3.5 text-cyan-600" />
                         <span>Synthetic</span>
@@ -1515,7 +1521,7 @@ export default function App() {
                             ? 'bg-white text-blue-800 shadow-xs border border-slate-200'
                             : 'text-slate-600 hover:text-slate-900'
                         }`}
-                        title="Deterministic Ephemeral Token Vault ([ENTITY_UUID])"
+                        title="Deterministic Ephemeral Token Vault ([ENTITY_UUID])" data-tooltip="Deterministic Token Vault: Replaces PII with high-security tokens ([ENTITY_UUID])"
                       >
                         <Lock className="w-3.5 h-3.5 text-blue-600" />
                         <span>Token Vault</span>
@@ -1804,8 +1810,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={handleOpenAddPolicyModal}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition cursor-pointer shadow-sm"
-                >
+                  className="executive-tooltip tooltip-bottom inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition cursor-pointer shadow-sm" data-tooltip="Author custom organizational DLP regex guardrail">
                   <Zap className="w-3.5 h-3.5 text-cyan-400" />
                   <span>+ Add New Policy</span>
                 </button>
@@ -1815,7 +1820,7 @@ export default function App() {
                   type="button"
                   onClick={handleExportPolicyAuditSpec}
                   className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 transition cursor-pointer"
-                  title="Download EU AI Act & ISO 42001 Policy Spec"
+                  title="Download EU AI Act & ISO 42001 Policy Spec" data-tooltip="Download active policies as structured JSON compliance specification"
                 >
                   <span>Export Spec</span>
                 </button>
