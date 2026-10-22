@@ -1,21 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ShieldCheck, Lock, Activity, Eye, Zap, Layers, RefreshCw } from 'lucide-react';
+import { ShieldCheck, Lock, Activity, Eye, Zap } from 'lucide-react';
 
-interface ThreeDimensionalSecurityVaultProps {
+interface SecurityVisualizerProps {
   activeStep: number; // 0=idle, 1=ingress, 2=dlp_ner, 3=token_vault, 4=ai_upstream
   isTransiting: boolean;
   detectedCount: number;
   privacyMode: 'synthetic' | 'token';
   targetModel: string;
-}
-
-interface Point3D {
-  x: number;
-  y: number;
-  z: number;
-  label?: string;
-  color?: string;
-  size?: number;
 }
 
 interface Particle2D {
@@ -26,7 +17,7 @@ interface Particle2D {
   size: number;
 }
 
-export const ThreeDimensionalSecurityVault: React.FC<ThreeDimensionalSecurityVaultProps> = ({
+export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = ({
   activeStep,
   isTransiting,
   detectedCount,
@@ -34,12 +25,7 @@ export const ThreeDimensionalSecurityVault: React.FC<ThreeDimensionalSecurityVau
   targetModel,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [visualMode, setVisualMode] = useState<'3d' | '2d'>('3d');
-  const [rotationX, setRotationX] = useState<number>(0.2);
-  const [rotationY, setRotationY] = useState<number>(0);
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const isDraggingRef = useRef<boolean>(false);
-  const lastMousePosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -48,46 +34,18 @@ export const ThreeDimensionalSecurityVault: React.FC<ThreeDimensionalSecurityVau
     if (!ctx) return;
 
     let animationFrameId: number;
-    let angleY = rotationY;
-    let angleX = rotationX;
     let pulsePhase = 0;
     let scanLaserY = 0;
     let scanLaserDirection = 1;
+    let lockRotation = 0;
 
-    // 3D sphere lattice points
-    const sphereRadius = 90;
-    const points: Point3D[] = [];
-    const rings = 8;
-    const ptsPerRing = 14;
-
-    for (let r = 1; r < rings; r++) {
-      const phi = (Math.PI * r) / rings;
-      for (let p = 0; p < ptsPerRing; p++) {
-        const theta = (2 * Math.PI * p) / ptsPerRing;
-        points.push({
-          x: sphereRadius * Math.sin(phi) * Math.cos(theta),
-          y: sphereRadius * Math.cos(phi),
-          z: sphereRadius * Math.sin(phi) * Math.sin(theta),
-        });
-      }
-    }
-
-    // 5 orbiting satellite nodes for 3D mode
-    const satellites = [
-      { name: 'UIDAI Aadhaar', color: '#0891b2', orbitRadius: 130, speed: 0.018, phase: 0 },
-      { name: 'PCI Card Token', color: '#2563eb', orbitRadius: 140, speed: 0.014, phase: 1.3 },
-      { name: 'HIPAA Medical', color: '#059669', orbitRadius: 125, speed: 0.022, phase: 2.6 },
-      { name: 'OWASP LLM01', color: '#e11d48', orbitRadius: 145, speed: 0.016, phase: 3.9 },
-      { name: 'Synthetic Surrogates', color: '#7c3aed', orbitRadius: 135, speed: 0.02, phase: 5.2 },
-    ];
-
-    // 2D Flow Particles
-    const particles2D: Particle2D[] = Array.from({ length: 32 }, (_, i) => ({
-      progress: (i / 32),
-      speed: 0.006 + Math.random() * 0.005,
-      offsetY: (Math.random() - 0.5) * 20,
-      color: i % 2 === 0 ? '#06b6d4' : '#8b5cf6',
-      size: 2 + Math.random() * 2,
+    // 2D Flow Particles (40 stream particles)
+    const particles2D: Particle2D[] = Array.from({ length: 40 }, (_, i) => ({
+      progress: (i / 40),
+      speed: 0.005 + Math.random() * 0.006,
+      offsetY: (Math.random() - 0.5) * 22,
+      color: i % 3 === 0 ? '#06b6d4' : i % 3 === 1 ? '#10b981' : '#8b5cf6',
+      size: 2 + Math.random() * 2.5,
     }));
 
     const render = () => {
@@ -103,264 +61,129 @@ export const ThreeDimensionalSecurityVault: React.FC<ThreeDimensionalSecurityVau
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
       ctx.clearRect(0, 0, width, height);
 
-      const cx = width / 2;
       const cy = height / 2;
-      pulsePhase += isTransiting ? 0.15 : 0.04;
+      pulsePhase += isTransiting ? 0.16 : 0.04;
+      lockRotation += isTransiting ? 0.08 : 0.02;
 
-      if (visualMode === '3d') {
-        // ==========================================
-        // 3D SPATIAL CRYPTOGRAPHIC SPHERE RENDERER
-        // ==========================================
-        const focalLength = 320;
-        const rotSpeed = isTransiting ? 0.035 : 0.007;
-        angleY += rotSpeed;
+      // ==========================================
+      // 2D INTERACTIVE CYBERNETIC FLOW PIPELINE
+      // ==========================================
+      // Station Coordinates
+      const s1 = { x: width * 0.13, y: cy, label: 'Client Ingress', sub: 'Raw PII', color: '#06b6d4', icon: '1' };
+      const s2 = { x: width * 0.38, y: cy, label: 'DLP NER Guard', sub: 'Presidio + C#', color: '#10b981', icon: '2' };
+      const s3 = { x: width * 0.63, y: cy, label: 'Token Vault', sub: privacyMode === 'synthetic' ? '✨ Synthetics' : '🔒 Ephemeral', color: '#8b5cf6', icon: '3' };
+      const s4 = { x: width * 0.88, y: cy, label: 'AI Cloud', sub: targetModel.includes('Gemini') ? 'Google Gemini' : 'Groq Cloud', color: '#2563eb', icon: '4' };
 
-        const project = (p: Point3D): { px: number; py: number; scale: number; visible: boolean } => {
-          const cosY = Math.cos(angleY);
-          const sinY = Math.sin(angleY);
-          const x1 = p.x * cosY - p.z * sinY;
-          const z1 = p.z * cosY + p.x * sinY;
+      const stations = [s1, s2, s3, s4];
 
-          const cosX = Math.cos(angleX);
-          const sinX = Math.sin(angleX);
-          const y2 = p.y * cosX - z1 * sinX;
-          const z2 = z1 * cosX + p.y * sinX;
+      // Draw Background Track Gradient
+      const trackGrad = ctx.createLinearGradient(s1.x, cy, s4.x, cy);
+      trackGrad.addColorStop(0, 'rgba(6, 182, 212, 0.15)');
+      trackGrad.addColorStop(0.35, 'rgba(16, 185, 129, 0.15)');
+      trackGrad.addColorStop(0.65, 'rgba(139, 92, 246, 0.15)');
+      trackGrad.addColorStop(1, 'rgba(37, 99, 235, 0.15)');
 
-          const distance = focalLength + z2;
-          if (distance <= 10) return { px: cx, py: cy, scale: 0, visible: false };
+      // Draw Main Connecting Bus Cables
+      ctx.beginPath();
+      ctx.moveTo(s1.x, s1.y);
+      ctx.bezierCurveTo((s1.x + s2.x) / 2, s1.y - 12, (s1.x + s2.x) / 2, s2.y + 12, s2.x, s2.y);
+      ctx.bezierCurveTo((s2.x + s3.x) / 2, s2.y - 12, (s2.x + s3.x) / 2, s3.y + 12, s3.x, s3.y);
+      ctx.bezierCurveTo((s3.x + s4.x) / 2, s3.y - 12, (s3.x + s4.x) / 2, s4.y + 12, s4.x, s4.y);
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 7;
+      ctx.lineCap = 'round';
+      ctx.stroke();
 
-          const scale = focalLength / distance;
-          return {
-            px: cx + x1 * scale,
-            py: cy + y2 * scale,
-            scale,
-            visible: z2 > -focalLength + 50,
-          };
-        };
+      ctx.strokeStyle = trackGrad;
+      ctx.lineWidth = 3.5;
+      ctx.stroke();
 
-        // Background radial glow
-        const bgGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, sphereRadius * 1.5);
-        bgGrad.addColorStop(0, 'rgba(238, 242, 255, 0.7)');
-        bgGrad.addColorStop(0.7, 'rgba(248, 250, 252, 0.4)');
-        bgGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, width, height);
+      // Station 2: Active Sweeping Laser Scanner Beam (Presidio NER inspection)
+      scanLaserY += scanLaserDirection * (isTransiting ? 2.8 : 1.2);
+      if (scanLaserY > 26) scanLaserDirection = -1;
+      if (scanLaserY < -26) scanLaserDirection = 1;
 
-        // Equatorial orbit ring
+      ctx.beginPath();
+      ctx.moveTo(s2.x - 28, s2.y + scanLaserY);
+      ctx.lineTo(s2.x + 28, s2.y + scanLaserY);
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = '#10b981';
+      ctx.shadowBlur = 8;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Station 3: Rotating Cryptographic Vault Ring
+      ctx.save();
+      ctx.translate(s3.x, s3.y);
+      ctx.rotate(lockRotation);
+      ctx.beginPath();
+      ctx.arc(0, 0, 26, 0, Math.PI * 2);
+      ctx.strokeStyle = isTransiting ? 'rgba(139, 92, 246, 0.7)' : 'rgba(139, 92, 246, 0.3)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 6]);
+      ctx.stroke();
+      ctx.restore();
+
+      // Flowing 2D Particles along data paths
+      particles2D.forEach((p) => {
+        p.progress += p.speed * (isTransiting ? 2.6 : 1.0);
+        if (p.progress > 1) p.progress = 0;
+
+        const px = s1.x + (s4.x - s1.x) * p.progress;
+        const py = cy + Math.sin(p.progress * Math.PI * 4) * 8 + p.offsetY * 0.3;
+
         ctx.beginPath();
-        for (let i = 0; i <= 40; i++) {
-          const rad = (i / 40) * Math.PI * 2;
-          const rx = Math.cos(rad) * (sphereRadius + 20);
-          const rz = Math.sin(rad) * (sphereRadius + 20);
-          const prj = project({ x: rx, y: 0, z: rz });
-          if (i === 0) ctx.moveTo(prj.px, prj.py);
-          else ctx.lineTo(prj.px, prj.py);
-        }
-        ctx.strokeStyle = isTransiting ? 'rgba(6, 182, 212, 0.5)' : 'rgba(203, 213, 225, 0.6)';
-        ctx.lineWidth = 1.2;
-        ctx.setLineDash([4, 4]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Sphere lattice
-        const projectedLattice = points.map((p) => ({ ...project(p), orig: p }));
-        ctx.strokeStyle = isTransiting ? 'rgba(8, 145, 178, 0.18)' : 'rgba(148, 163, 184, 0.12)';
-        ctx.lineWidth = 0.8;
-        for (let i = 0; i < projectedLattice.length - 1; i += 2) {
-          const p1 = projectedLattice[i];
-          const p2 = projectedLattice[i + 1];
-          if (p1.visible && p2.visible) {
-            ctx.beginPath();
-            ctx.moveTo(p1.px, p1.py);
-            ctx.lineTo(p2.px, p2.py);
-            ctx.stroke();
-          }
-        }
-
-        // Lattice dots
-        projectedLattice.forEach((p) => {
-          if (!p.visible) return;
-          const alpha = Math.max(0.15, Math.min(0.85, (p.scale - 0.4) * 1.4));
-          ctx.fillStyle = isTransiting ? `rgba(8, 145, 178, ${alpha})` : `rgba(100, 116, 139, ${alpha * 0.7})`;
-          ctx.beginPath();
-          ctx.arc(p.px, p.py, Math.max(1, 1.8 * p.scale), 0, Math.PI * 2);
-          ctx.fill();
-        });
-
-        // Core 3D Pulsing Cryptographic Shield
-        const corePulse = Math.sin(pulsePhase) * 6;
-        const coreRadius = (22 + corePulse) * (isTransiting ? 1.25 : 1);
-        const coreGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, coreRadius);
-        if (isTransiting) {
-          coreGrad.addColorStop(0, 'rgba(6, 182, 212, 0.9)');
-          coreGrad.addColorStop(0.6, 'rgba(37, 99, 235, 0.6)');
-          coreGrad.addColorStop(1, 'rgba(16, 185, 129, 0)');
-        } else {
-          coreGrad.addColorStop(0, 'rgba(14, 165, 233, 0.6)');
-          coreGrad.addColorStop(0.7, 'rgba(99, 102, 241, 0.25)');
-          coreGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        }
-        ctx.fillStyle = coreGrad;
-        ctx.beginPath();
-        ctx.arc(cx, cy, coreRadius, 0, Math.PI * 2);
+        ctx.arc(px, py, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 6;
         ctx.fill();
-
-        // Core Diamond
-        ctx.beginPath();
-        ctx.moveTo(cx, cy - 14);
-        ctx.lineTo(cx + 12, cy - 2);
-        ctx.lineTo(cx, cy + 14);
-        ctx.lineTo(cx - 12, cy - 2);
-        ctx.closePath();
-        ctx.strokeStyle = isTransiting ? '#06b6d4' : '#2563eb';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        ctx.fillStyle = isTransiting ? 'rgba(6, 182, 212, 0.2)' : 'rgba(37, 99, 235, 0.15)';
-        ctx.fill();
-
-        // Satellites sorted by Z
-        const projectedSatellites = satellites.map((sat, idx) => {
-          const curAngle = angleY * 1.4 + sat.phase;
-          const sx = Math.cos(curAngle) * sat.orbitRadius;
-          const sz = Math.sin(curAngle) * sat.orbitRadius;
-          const sy = Math.sin(curAngle * 2 + idx) * 22;
-          const prj = project({ x: sx, y: sy, z: sz });
-          return { ...sat, ...prj, zDist: sz };
-        });
-
-        projectedSatellites.sort((a, b) => b.scale - a.scale);
-
-        projectedSatellites.forEach((sat) => {
-          if (!sat.visible) return;
-          ctx.beginPath();
-          ctx.moveTo(cx, cy);
-          ctx.lineTo(sat.px, sat.py);
-          ctx.strokeStyle = isTransiting ? 'rgba(6, 182, 212, 0.25)' : 'rgba(203, 213, 225, 0.4)';
-          ctx.lineWidth = 0.8;
-          ctx.stroke();
-
-          const nodeSize = Math.max(4, 7 * sat.scale);
-          ctx.beginPath();
-          ctx.arc(sat.px, sat.py, nodeSize + (isTransiting ? 4 : 2), 0, Math.PI * 2);
-          ctx.fillStyle = sat.color + (isTransiting ? '55' : '33');
-          ctx.fill();
-
-          ctx.beginPath();
-          ctx.arc(sat.px, sat.py, nodeSize, 0, Math.PI * 2);
-          ctx.fillStyle = sat.color;
-          ctx.fill();
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
-
-          ctx.font = `600 ${Math.max(9, Math.round(10.5 * sat.scale))}px Inter, system-ui, sans-serif`;
-          ctx.fillStyle = '#0f172a';
-          ctx.textAlign = 'center';
-          ctx.fillText(sat.name, sat.px, sat.py - nodeSize - 4);
-        });
-
-      } else {
-        // ==========================================
-        // 2D INTERACTIVE TOPOLOGICAL FLOW RENDERER
-        // ==========================================
-        // Station Coordinates
-        const s1 = { x: width * 0.14, y: cy, label: 'Client Ingress', sub: 'Raw PII', color: '#06b6d4', icon: '1' };
-        const s2 = { x: width * 0.38, y: cy, label: 'DLP NER Guard', sub: 'Real-time Scanner', color: '#10b981', icon: '2' };
-        const s3 = { x: width * 0.62, y: cy, label: 'Token Vault', sub: privacyMode === 'synthetic' ? 'Synthetics' : 'Vault TTL', color: '#8b5cf6', icon: '3' };
-        const s4 = { x: width * 0.86, y: cy, label: 'AI Upstream', sub: targetModel.includes('Gemini') ? 'Gemini' : 'Groq', color: '#2563eb', icon: '4' };
-
-        const stations = [s1, s2, s3, s4];
-
-        // Draw Connecting Bus Lines
-        ctx.beginPath();
-        ctx.moveTo(s1.x, s1.y);
-        ctx.bezierCurveTo((s1.x + s2.x) / 2, s1.y - 15, (s1.x + s2.x) / 2, s2.y + 15, s2.x, s2.y);
-        ctx.bezierCurveTo((s2.x + s3.x) / 2, s2.y - 15, (s2.x + s3.x) / 2, s3.y + 15, s3.x, s3.y);
-        ctx.bezierCurveTo((s3.x + s4.x) / 2, s3.y - 15, (s3.x + s4.x) / 2, s4.y + 15, s4.x, s4.y);
-        ctx.strokeStyle = '#e2e8f0';
-        ctx.lineWidth = 6;
-        ctx.lineCap = 'round';
-        ctx.stroke();
-
-        ctx.strokeStyle = isTransiting ? '#06b6d4' : '#cbd5e1';
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
-
-        // 2D Laser Scanning effect on Station 2 (DLP NER Guard)
-        scanLaserY += scanLaserDirection * (isTransiting ? 2.5 : 1.2);
-        if (scanLaserY > 28) scanLaserDirection = -1;
-        if (scanLaserY < -28) scanLaserDirection = 1;
-
-        ctx.beginPath();
-        ctx.moveTo(s2.x - 30, s2.y + scanLaserY);
-        ctx.lineTo(s2.x + 30, s2.y + scanLaserY);
-        ctx.strokeStyle = 'rgba(16, 185, 129, 0.7)';
-        ctx.lineWidth = 2;
-        ctx.shadowColor = '#10b981';
-        ctx.shadowBlur = 8;
-        ctx.stroke();
         ctx.shadowBlur = 0;
+      });
 
-        // Flowing 2D Particles along data paths
-        particles2D.forEach((p) => {
-          p.progress += p.speed * (isTransiting ? 2.8 : 1.0);
-          if (p.progress > 1) p.progress = 0;
+      // Draw 4 Station Nodes
+      stations.forEach((st, idx) => {
+        const stepNum = idx + 1;
+        const isActive = activeStep === stepNum || (isTransiting && activeStep >= stepNum);
 
-          const px = s1.x + (s4.x - s1.x) * p.progress;
-          const py = cy + Math.sin(p.progress * Math.PI * 4) * 8 + p.offsetY * 0.3;
+        // Outer Glow Ring
+        ctx.beginPath();
+        ctx.arc(st.x, st.y, 28 + (isActive ? Math.sin(pulsePhase) * 4 : 0), 0, Math.PI * 2);
+        ctx.fillStyle = isActive ? st.color + '22' : 'rgba(241, 245, 249, 0.8)';
+        ctx.fill();
+        ctx.strokeStyle = isActive ? st.color : '#cbd5e1';
+        ctx.lineWidth = isActive ? 2.5 : 1.5;
+        ctx.stroke();
 
-          ctx.beginPath();
-          ctx.arc(px, py, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = p.color;
-          ctx.shadowColor = p.color;
-          ctx.shadowBlur = 6;
-          ctx.fill();
-          ctx.shadowBlur = 0;
-        });
+        // Station Body
+        ctx.beginPath();
+        ctx.arc(st.x, st.y, 20, 0, Math.PI * 2);
+        ctx.fillStyle = isActive ? st.color : '#ffffff';
+        ctx.fill();
+        ctx.strokeStyle = isActive ? '#ffffff' : '#94a3b8';
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
-        // Draw 4 Station Nodes
-        stations.forEach((st, idx) => {
-          const stepNum = idx + 1;
-          const isActive = activeStep === stepNum || (isTransiting && activeStep >= stepNum);
+        // Station Step Number / Icon
+        ctx.font = 'bold 12px Inter, system-ui, sans-serif';
+        ctx.fillStyle = isActive ? '#ffffff' : '#475569';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(st.icon, st.x, st.y);
 
-          // Outer Glow Ring
-          ctx.beginPath();
-          ctx.arc(st.x, st.y, 28 + (isActive ? Math.sin(pulsePhase) * 4 : 0), 0, Math.PI * 2);
-          ctx.fillStyle = isActive ? st.color + '22' : 'rgba(241, 245, 249, 0.8)';
-          ctx.fill();
-          ctx.strokeStyle = isActive ? st.color : '#cbd5e1';
-          ctx.lineWidth = isActive ? 2.5 : 1.5;
-          ctx.stroke();
+        // Text Label
+        ctx.font = 'bold 11px Inter, system-ui, sans-serif';
+        ctx.fillStyle = '#0f172a';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText(st.label, st.x, st.y + 42);
 
-          // Station Body
-          ctx.beginPath();
-          ctx.arc(st.x, st.y, 20, 0, Math.PI * 2);
-          ctx.fillStyle = isActive ? st.color : '#ffffff';
-          ctx.fill();
-          ctx.strokeStyle = isActive ? '#ffffff' : '#94a3b8';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-
-          // Station Step Number / Icon
-          ctx.font = 'bold 12px Inter, system-ui, sans-serif';
-          ctx.fillStyle = isActive ? '#ffffff' : '#475569';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(st.icon, st.x, st.y);
-
-          // Text Label
-          ctx.font = 'bold 11px Inter, system-ui, sans-serif';
-          ctx.fillStyle = '#0f172a';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'alphabetic';
-          ctx.fillText(st.label, st.x, st.y + 40);
-
-          // Subtext
-          ctx.font = '500 10px monospace';
-          ctx.fillStyle = '#64748b';
-          ctx.fillText(st.sub, st.x, st.y + 54);
-        });
-      }
+        // Subtext
+        ctx.font = '500 10px monospace';
+        ctx.fillStyle = '#64748b';
+        ctx.fillText(st.sub, st.x, st.y + 56);
+      });
 
       ctx.restore();
       animationFrameId = requestAnimationFrame(render);
@@ -371,84 +194,31 @@ export const ThreeDimensionalSecurityVault: React.FC<ThreeDimensionalSecurityVau
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [rotationX, rotationY, isTransiting, visualMode, privacyMode, targetModel, activeStep]);
-
-  // Mouse interaction for 3D manual rotation
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (visualMode !== '3d') return;
-    isDraggingRef.current = true;
-    lastMousePosRef.current = { x: e.clientX, y: e.clientY };
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDraggingRef.current || visualMode !== '3d') return;
-    const deltaX = e.clientX - lastMousePosRef.current.x;
-    const deltaY = e.clientY - lastMousePosRef.current.y;
-    lastMousePosRef.current = { x: e.clientX, y: e.clientY };
-
-    setRotationY((prev) => prev + deltaX * 0.01);
-    setRotationX((prev) => Math.max(-0.6, Math.min(0.6, prev + deltaY * 0.01)));
-  };
-
-  const handleMouseUp = () => {
-    isDraggingRef.current = false;
-  };
+  }, [isTransiting, privacyMode, targetModel, activeStep]);
 
   return (
     <div className="relative rounded-2xl bg-white border border-slate-200 p-4 shadow-sm overflow-hidden flex flex-col md:flex-row items-center justify-between gap-4">
-      {/* Visual Canvas Area */}
+      {/* 2D Cybernetic Flow Canvas */}
       <div
-        className="relative w-full md:w-3/5 h-64 sm:h-72 cursor-grab active:cursor-grabbing flex items-center justify-center bg-radial from-slate-50 to-white rounded-xl"
+        className="relative w-full md:w-3/5 h-64 sm:h-72 flex items-center justify-center bg-radial from-slate-50 to-white rounded-xl"
         onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => {
-          setIsHovered(false);
-          isDraggingRef.current = false;
-        }}
+        onMouseLeave={() => setIsHovered(false)}
       >
         <canvas
           ref={canvasRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
           className="w-full h-full block"
         />
 
-        {/* 2D / 3D Mode Switcher (New Feature) */}
-        <div className="absolute top-2 left-2 z-10 flex items-center bg-white/95 backdrop-blur-md p-1 rounded-xl border border-slate-200 shadow-xs">
-          <button
-            type="button"
-            onClick={() => setVisualMode('3d')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-              visualMode === '3d'
-                ? 'bg-slate-900 text-white shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Layers className="w-3 h-3 text-cyan-400" />
-            <span>3D Spatial Sphere</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setVisualMode('2d')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-              visualMode === '2d'
-                ? 'bg-slate-900 text-white shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Zap className="w-3 h-3 text-emerald-400" />
-            <span>2D Flow Pipeline</span>
-          </button>
+        {/* 2D Pipeline Indicator Badge */}
+        <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200 text-xs font-bold text-slate-800 shadow-xs">
+          <Zap className="w-3.5 h-3.5 text-cyan-600" />
+          <span>2D Cybernetic Flow Pipeline</span>
         </div>
 
-        {/* Interaction Hint Badge */}
+        {/* Live Status Hint */}
         <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-md border border-slate-200 text-[11px] font-mono text-slate-600 shadow-xs flex items-center gap-1.5">
           <Activity className="w-3.5 h-3.5 text-cyan-600 animate-pulse" />
-          <span>
-            {visualMode === '3d'
-              ? 'Interactive 3D Vault • Drag to Orbit'
-              : '2D Dynamic Network Flow • Live Particle Streams'}
-          </span>
+          <span>Real-Time Egress Pipeline • Continuous Particle Streams</span>
         </div>
 
         {/* Real-time Transit Burst Badge */}
@@ -535,7 +305,7 @@ export const ThreeDimensionalSecurityVault: React.FC<ThreeDimensionalSecurityVau
         <div className="rounded-xl bg-emerald-50/80 border border-emerald-200/70 p-2 flex items-center gap-2 text-xs text-emerald-900">
           <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
           <span className="text-[11px] font-medium leading-tight">
-            Dual 2D/3D Telemetry • Zero Raw PII Transmitted to External Models
+            2D Interactive Stream • Zero Raw PII Transmitted to External Models
           </span>
         </div>
       </div>
