@@ -14,11 +14,11 @@ public static partial class GatewayEndpoints
 {
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, DepartmentQuota> DepartmentQuotas = new(new[]
     {
-        new KeyValuePair<string, DepartmentQuota>("SecOps RedTeam", new DepartmentQuota("SecOps RedTeam", 150000, 42100, 80, 0.15, 14.82)),
-        new KeyValuePair<string, DepartmentQuota>("FinTech Core", new DepartmentQuota("FinTech Core", 100000, 28450, 80, 0.15, 9.60)),
-        new KeyValuePair<string, DepartmentQuota>("Health Informatics", new DepartmentQuota("Health Informatics", 75000, 16200, 80, 0.15, 5.40)),
-        new KeyValuePair<string, DepartmentQuota>("DevSecOps", new DepartmentQuota("DevSecOps", 200000, 112400, 80, 0.15, 38.20)),
-        new KeyValuePair<string, DepartmentQuota>("Legal & HR", new DepartmentQuota("Legal & HR", 50000, 9800, 80, 0.15, 3.15))
+        new KeyValuePair<string, DepartmentQuota>("Mumbai FinTech & Payments", new DepartmentQuota("Mumbai FinTech & Payments", 150000, 42100, 80, 12.50, 1240.00)),
+        new KeyValuePair<string, DepartmentQuota>("Bengaluru AI R&D Core", new DepartmentQuota("Bengaluru AI R&D Core", 200000, 112400, 80, 12.50, 3180.00)),
+        new KeyValuePair<string, DepartmentQuota>("Hyderabad SecOps RedTeam", new DepartmentQuota("Hyderabad SecOps RedTeam", 100000, 28450, 80, 12.50, 820.00)),
+        new KeyValuePair<string, DepartmentQuota>("AIIMS Delhi Health Informatics", new DepartmentQuota("AIIMS Delhi Health Informatics", 75000, 16200, 80, 12.50, 450.00)),
+        new KeyValuePair<string, DepartmentQuota>("New Delhi Legal & Compliance", new DepartmentQuota("New Delhi Legal & Compliance", 50000, 9800, 80, 12.50, 280.00))
     });
 
     [GeneratedRegex(@"\[([A-Z0-9_]+_[A-F0-9]{4,8})\]", RegexOptions.Compiled)]
@@ -387,7 +387,7 @@ public static partial class GatewayEndpoints
             });
         });
 
-        // 10. Enterprise FinOps: Departmental Token Quotas & Cost Governance
+        // 10. Enterprise FinOps: Departmental Token Quotas & Cost Governance (Indian Rupee ₹ INR)
         app.MapGet("/api/governance/quotas", () =>
         {
             var list = DepartmentQuotas.Values.Select(q => new
@@ -400,26 +400,28 @@ public static partial class GatewayEndpoints
                 q.SoftLimitPercentage,
                 Status = q.ConsumedTokens >= q.DailyTokenLimit ? "THROTTLED" :
                          q.ConsumedTokens >= (q.DailyTokenLimit * q.SoftLimitPercentage / 100) ? "WARNING" : "HEALTHY",
-                q.CostPerMillionTokensUsd,
-                EstimatedCostUsd = Math.Round((q.ConsumedTokens / 1_000_000.0) * q.CostPerMillionTokensUsd, 4),
-                q.FinOpsSavingsUsd
+                q.CostPerMillionTokensInr,
+                EstimatedCostInr = Math.Round((q.ConsumedTokens / 1_000_000.0) * q.CostPerMillionTokensInr, 2),
+                q.FinOpsSavingsInr,
+                Currency = "₹ INR"
             }).ToList();
 
             var totalLimit = list.Sum(x => x.DailyTokenLimit);
             var totalConsumed = list.Sum(x => x.ConsumedTokens);
-            var totalSavings = list.Sum(x => x.FinOpsSavingsUsd);
+            var totalSavings = list.Sum(x => x.FinOpsSavingsInr);
 
             return Results.Ok(new
             {
+                currency = "₹ INR",
                 departments = list,
                 overallSummary = new
                 {
                     totalDailyBudget = totalLimit,
                     totalConsumedTokens = totalConsumed,
                     overallUtilizationPct = Math.Round(((double)totalConsumed / totalLimit) * 100, 1),
-                    totalFinOpsSavingsUsd = Math.Round(totalSavings, 2),
-                    costOptimizationPolicy = "PII format-preserving tokenization saves 28% egress payload tokens",
-                    activeSlaTier = "99.99% Enterprise Multi-Region Cloud"
+                    totalFinOpsSavingsInr = Math.Round(totalSavings, 2),
+                    costOptimizationPolicy = "DPDP Act 2023 & RBI Tokenization strips 28% egress payload tokens",
+                    activeSlaTier = "99.99% ap-south-1 (Mumbai Primary) Multi-Zone Cloud"
                 }
             });
         });
@@ -453,7 +455,7 @@ public static partial class GatewayEndpoints
             {
                 eventId,
                 timestampUtc = timestamp,
-                cluster = "gateway-cluster-us-east-1",
+                cluster = "gateway-cluster-ap-south-1-mumbai",
                 source = "AegisDLP-YARP-Proxy-2027",
                 severity = req.Severity ?? "HIGH",
                 eventType = req.EventType ?? "ADVERSARIAL_THREAT_INTERCEPTED",
@@ -492,11 +494,11 @@ public static partial class GatewayEndpoints
                 generatedAtUtc = DateTime.UtcNow,
                 frameworks = new object[]
                 {
+                    new { standard = "DPDP Act 2023 (Digital Personal Data Protection Act, India)", articles = new[] { "Section 6 (Consent Manager Architecture)", "Section 8 (Data Fiduciary Safeguards)", "Section 9 (Child & Vulnerable Data Protection)" }, conformity = "FULL_CONFORMITY" },
+                    new { standard = "UIDAI Aadhaar Act & Circulars 2016-2024", requirement = "Regulation 16A: Masked Aadhaar & Virtual Identity Tokenization", conformity = "CERTIFIED" },
+                    new { standard = "RBI Master Direction on Payment Tokenization", requirement = "CoF Tokenization & Card-on-File Zero-Storage Mandate", conformity = "COMPLIANT" },
                     new { standard = "EU AI Act (Regulation 2024/1689)", articles = new[] { "Art. 15 (Accuracy, Robustness, Cybersecurity)", "Art. 50 (Transparency for AI systems)" }, conformity = "FULL_CONFORMITY" },
-                    new { standard = "ISO/IEC 42001:2023", scope = "Information technology — Artificial intelligence — Management system", conformity = "CERTIFIED" },
-                    new { standard = "NIST AI RMF 1.0", functions = new[] { "GOVERN", "MAP", "MEASURE", "MANAGE" }, conformity = "TIER_4_ADAPTIVE" },
-                    new { standard = "PCI-DSS v4.0.1", requirement = "Req 3.4 & 3.5: Primary Account Number Tokenization", conformity = "COMPLIANT" },
-                    new { standard = "HIPAA Security Rule", requirement = "45 CFR § 164.312 Technical Safeguards", conformity = "COMPLIANT" }
+                    new { standard = "ISO/IEC 42001:2023", scope = "Information technology — Artificial intelligence — Management system", conformity = "CERTIFIED" }
                 },
                 activeGuardrailsCount = policies.Count,
                 auditTrailStatistics = new
@@ -600,8 +602,8 @@ public record DepartmentQuota(
     int DailyTokenLimit,
     int ConsumedTokens,
     int SoftLimitPercentage,
-    double CostPerMillionTokensUsd,
-    double FinOpsSavingsUsd);
+    double CostPerMillionTokensInr,
+    double FinOpsSavingsInr);
 
 public record QuotaUpdateRequest(string Department, int DailyTokenLimit, int SoftLimitPercentage = 80);
 public record WebhookTestRequest(string? TargetPlatform, string? EventType, string? Severity, string? UserEmail, string? Department);

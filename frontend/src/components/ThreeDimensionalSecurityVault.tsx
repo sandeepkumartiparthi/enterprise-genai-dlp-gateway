@@ -40,11 +40,11 @@ const STATION_PODS_INFO = [
   {
     step: 3,
     pct: 0.63,
-    name: 'Cryptographic Vault Pod',
-    role: 'Surrogate Generation & Token Chamber',
+    name: 'Surrogate Isolation Pod',
+    role: 'Dynamic Privacy Engine (Synthetic / Token Chamber)',
     badge: 'ZERO-TRUST ISOLATION',
-    color: '#7c3aed',
-    desc: 'Encapsulates true identifiers in an ephemeral in-memory vault with cryptographic hash receipts.',
+    color: '#9333ea',
+    desc: 'Switches dynamically between Indian Synthetic Personas (natural grammar) and Ephemeral Token Chamber ([ENTITY_UUID]).',
   },
   {
     step: 4,
@@ -203,12 +203,14 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
           step: 3,
           x: width * 0.63,
           y: cy,
-          name: 'Cryptographic Vault',
-          sub: privacyMode === 'synthetic' ? '✨ Synthetic Shadows' : '🔒 Token Chamber',
-          tag: 'SURROGATES',
-          color: '#7c3aed',
-          glow: 'rgba(124, 58, 237, 0.25)',
-          details: 'Zero-Trust Storage: Deterministic Ephemeral TTL Vault & Surrogates',
+          name: privacyMode === 'synthetic' ? 'Indian Synthetic Shadows Pod' : 'Cryptographic Token Chamber',
+          sub: privacyMode === 'synthetic' ? '✨ Indian Personas (Natural Grammar)' : '🔒 Ephemeral UUID Vault',
+          tag: privacyMode === 'synthetic' ? 'SYNTHETIC SHADOWS' : 'TOKEN VAULT',
+          color: privacyMode === 'synthetic' ? '#9333ea' : '#2563eb',
+          glow: privacyMode === 'synthetic' ? 'rgba(147, 51, 234, 0.35)' : 'rgba(37, 99, 235, 0.35)',
+          details: privacyMode === 'synthetic'
+            ? 'AI-Native Indian Synthetic Personas (natural grammar without bracketed placeholders)'
+            : 'Deterministic Ephemeral Token Chamber ([ENTITY_UUID] format-preserving tokens)',
         },
         {
           id: 'station-4',
@@ -483,7 +485,7 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
             <span className="font-semibold text-slate-800">Pipeline Online:</span>
             <span>4 Interconnected Security Pods Active</span>
           </div>
-          <span className="text-slate-400 hidden sm:inline">Comet-Tail Particle Bus</span>
+          <span className="text-slate-400 hidden sm:inline">ap-south-1 (Mumbai Core) • Comet-Tail Bus</span>
         </div>
       </div>
 
