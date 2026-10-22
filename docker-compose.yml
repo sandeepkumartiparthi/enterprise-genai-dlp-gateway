@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: aegisdlp-postgres
+    environment:
+      POSTGRES_USER: dlp_admin
+      POSTGRES_PASSWORD: dlp_secret_password
+      POSTGRES_DB: genai_dlp_audit
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: aegisdlp-redis
+    ports:
+      - "6379:6379"
+
+  presidio-analyzer:
+    image: mcr.microsoft.com/presidio-analyzer:latest
+    container_name: aegisdlp-presidio
+    ports:
+      - "5002:3000"
+
+volumes:
+  pgdata:
