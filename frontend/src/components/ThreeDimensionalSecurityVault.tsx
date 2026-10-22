@@ -435,28 +435,28 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
           className="w-full h-full block cursor-crosshair"
         />
 
-        {/* Floating Station Hover Popup */}
+        {/* Floating Station Hover Popup (Google Material Light Card - No Black Comments) */}
         {hoveredStationData && (
           <div
-            className="absolute z-40 pointer-events-none p-3 rounded-xl bg-slate-900/95 text-white border border-slate-700 shadow-2xl backdrop-blur-md text-xs animate-card-enter max-w-xs"
+            className="absolute z-40 pointer-events-none p-3 rounded-xl bg-white/95 text-slate-800 border border-slate-200 shadow-xl backdrop-blur-md text-xs animate-card-enter max-w-xs ring-1 ring-slate-900/5"
             style={{
               left: Math.max(10, Math.min(mousePos.x - 120, 260)),
               top: Math.max(10, mousePos.y - 105),
             }}
           >
-            <div className="flex items-center justify-between gap-2 mb-1 border-b border-slate-800 pb-1.5">
-              <div className="flex items-center gap-1.5 font-bold">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: hoveredStationData.color }} />
+            <div className="flex items-center justify-between gap-2 mb-1 border-b border-slate-100 pb-1.5">
+              <div className="flex items-center gap-1.5 font-bold text-slate-900">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: hoveredStationData.color }} />
                 <span>{hoveredStationData.name}</span>
               </div>
-              <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-slate-800 text-cyan-300 border border-slate-700">
+              <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-cyan-50 text-cyan-700 border border-cyan-200">
                 {hoveredStationData.badge}
               </span>
             </div>
-            <p className="text-[11px] text-slate-300 leading-snug">{hoveredStationData.desc}</p>
-            <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mt-1.5 pt-1 border-t border-slate-800">
+            <p className="text-[11px] text-slate-600 leading-snug">{hoveredStationData.desc}</p>
+            <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono mt-1.5 pt-1 border-t border-slate-100">
               <span>{hoveredStationData.role}</span>
-              <span className="text-emerald-400 font-semibold">Hop #{hoveredStationData.step}</span>
+              <span className="text-emerald-600 font-semibold">Hop #{hoveredStationData.step}</span>
             </div>
           </div>
         )}
@@ -508,7 +508,7 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-2 gap-2.5">
-          <div className="executive-tooltip tooltip-bottom rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5 cursor-help" data-tooltip="Format-Preserving Synthetic Shadows (natural grammar) vs Ephemeral UUID Tokens">
+          <div className="executive-tooltip tooltip-bottom rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5 cursor-help telemetry-tile" data-tooltip="Format-Preserving Synthetic Shadows (natural grammar) vs Ephemeral UUID Tokens">
             <span className="text-[10px] uppercase font-mono text-slate-500 block">DLP Mode</span>
             <span className="text-xs font-bold text-slate-900 flex items-center gap-1 mt-0.5">
               {privacyMode === 'synthetic' ? (
@@ -523,14 +523,14 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
             </span>
           </div>
 
-          <div className="executive-tooltip tooltip-bottom rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5 cursor-help" data-tooltip="Active Upstream LLM Target routed via Microsoft YARP reverse proxy">
+          <div className="executive-tooltip tooltip-bottom rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5 cursor-help telemetry-tile" data-tooltip="Active Upstream LLM Target routed via Microsoft YARP reverse proxy">
             <span className="text-[10px] uppercase font-mono text-slate-500 block">Upstream AI</span>
             <span className="text-xs font-bold text-slate-900 truncate block mt-0.5" title={targetModel}>
               {targetModel.includes('Gemini') ? 'Google Gemini' : 'Groq Cloud'}
             </span>
           </div>
 
-          <div className="executive-tooltip tooltip-bottom rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5 cursor-help" data-tooltip="Real-time multi-hop transit state of payload through gateway">
+          <div className="executive-tooltip tooltip-bottom rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5 cursor-help telemetry-tile" data-tooltip="Real-time multi-hop transit state of payload through gateway">
             <span className="text-[10px] uppercase font-mono text-slate-500 block">Pipeline Status</span>
             <span
               className={`text-xs font-bold flex items-center gap-1 mt-0.5 ${
@@ -552,7 +552,7 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
             </span>
           </div>
 
-          <div className="executive-tooltip tooltip-bottom rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5 cursor-help" data-tooltip="Total sensitive identifiers intercepted, encrypted, and isolated from external models">
+          <div className="executive-tooltip tooltip-bottom rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5 cursor-help telemetry-tile" data-tooltip="Total sensitive identifiers intercepted, encrypted, and isolated from external models">
             <span className="text-[10px] uppercase font-mono text-slate-500 block">Protected Items</span>
             <span className="text-xs font-bold text-emerald-700 mt-0.5 block">
               {detectedCount > 0 ? `${detectedCount} Encrypted` : '100% Shielded'}
@@ -561,7 +561,7 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
         </div>
 
         {/* Verification Status */}
-        <div className="rounded-xl bg-emerald-50/80 border border-emerald-200/70 p-2.5 flex items-center gap-2 text-xs text-emerald-900 shadow-2xs">
+        <div className="rounded-xl bg-emerald-50/80 border border-emerald-200/70 p-2.5 flex items-center gap-2 text-xs text-emerald-900 shadow-2xs telemetry-tile">
           <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
           <span className="text-[11px] font-medium leading-tight">
             2D Interactive Stream • Zero Raw PII Transmitted to External Models
