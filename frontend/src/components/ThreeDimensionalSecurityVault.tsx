@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ShieldCheck, Lock, Activity, Eye, Zap } from 'lucide-react';
+import { ShieldCheck, Lock, Activity, Eye, Zap, Sparkles, Cpu, Layers } from 'lucide-react';
 
 interface SecurityVisualizerProps {
   activeStep: number; // 0=idle, 1=ingress, 2=dlp_ner, 3=token_vault, 4=ai_upstream
@@ -9,12 +9,13 @@ interface SecurityVisualizerProps {
   targetModel: string;
 }
 
-interface Particle2D {
+interface StreamParticle {
   progress: number; // 0 to 1
   speed: number;
   offsetY: number;
   color: string;
   size: number;
+  tailLength: number;
 }
 
 export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = ({
@@ -25,7 +26,8 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
   targetModel,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [hoveredStation, setHoveredStation] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -37,19 +39,22 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
     let pulsePhase = 0;
     let scanLaserY = 0;
     let scanLaserDirection = 1;
-    let lockRotation = 0;
+    let gearAngle1 = 0;
+    let gearAngle2 = 0;
+    let cableDashOffset = 0;
 
-    // 2D Flow Particles (40 stream particles)
-    const particles2D: Particle2D[] = Array.from({ length: 40 }, (_, i) => ({
-      progress: (i / 40),
-      speed: 0.005 + Math.random() * 0.006,
-      offsetY: (Math.random() - 0.5) * 22,
+    // 45 High-fidelity flowing particles with comet tails
+    const particles: StreamParticle[] = Array.from({ length: 45 }, (_, i) => ({
+      progress: i / 45,
+      speed: 0.005 + (i % 5) * 0.0012,
+      offsetY: ((i % 7) - 3) * 4,
       color: i % 3 === 0 ? '#06b6d4' : i % 3 === 1 ? '#10b981' : '#8b5cf6',
-      size: 2 + Math.random() * 2.5,
+      size: 2.2 + (i % 3) * 1.2,
+      tailLength: 10 + (i % 4) * 6,
     }));
 
     const render = () => {
-      // Handle high DPI
+      // High-DPI handling
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
       if (canvas.width !== width * window.devicePixelRatio || canvas.height !== height * window.devicePixelRatio) {
@@ -62,127 +67,277 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
       ctx.clearRect(0, 0, width, height);
 
       const cy = height / 2;
-      pulsePhase += isTransiting ? 0.16 : 0.04;
-      lockRotation += isTransiting ? 0.08 : 0.02;
+      pulsePhase += isTransiting ? 0.18 : 0.04;
+      gearAngle1 += isTransiting ? 0.05 : 0.015;
+      gearAngle2 -= isTransiting ? 0.04 : 0.012;
+      cableDashOffset -= isTransiting ? 3.0 : 1.2;
 
       // ==========================================
-      // 2D INTERACTIVE CYBERNETIC FLOW PIPELINE
+      // 1. BACKGROUND GRAPHICS & TECH GRID
       // ==========================================
-      // Station Coordinates
-      const s1 = { x: width * 0.13, y: cy, label: 'Client Ingress', sub: 'Raw PII', color: '#06b6d4', icon: '1' };
-      const s2 = { x: width * 0.38, y: cy, label: 'DLP NER Guard', sub: 'Presidio + C#', color: '#10b981', icon: '2' };
-      const s3 = { x: width * 0.63, y: cy, label: 'Token Vault', sub: privacyMode === 'synthetic' ? '✨ Synthetics' : '🔒 Ephemeral', color: '#8b5cf6', icon: '3' };
-      const s4 = { x: width * 0.88, y: cy, label: 'AI Cloud', sub: targetModel.includes('Gemini') ? 'Google Gemini' : 'Groq Cloud', color: '#2563eb', icon: '4' };
+      const gridSize = 32;
+      ctx.strokeStyle = 'rgba(226, 232, 240, 0.45)';
+      ctx.lineWidth = 0.6;
+      for (let x = 0; x < width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
 
-      const stations = [s1, s2, s3, s4];
+      // Intersection micro-dots
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.35)';
+      for (let x = 0; x < width; x += gridSize * 2) {
+        for (let y = 0; y < height; y += gridSize * 2) {
+          ctx.beginPath();
+          ctx.arc(x, y, 1.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
 
-      // Draw Background Track Gradient
-      const trackGrad = ctx.createLinearGradient(s1.x, cy, s4.x, cy);
-      trackGrad.addColorStop(0, 'rgba(6, 182, 212, 0.15)');
-      trackGrad.addColorStop(0.35, 'rgba(16, 185, 129, 0.15)');
-      trackGrad.addColorStop(0.65, 'rgba(139, 92, 246, 0.15)');
-      trackGrad.addColorStop(1, 'rgba(37, 99, 235, 0.15)');
+      // ==========================================
+      // 2. 4 STATION POD COORDINATES & GRAPHICS
+      // ==========================================
+      const stations = [
+        {
+          id: 'station-1',
+          step: 1,
+          x: width * 0.13,
+          y: cy,
+          name: 'Client Ingress',
+          sub: 'Corporate Terminal',
+          tag: 'RAW PII',
+          color: '#0891b2',
+          glow: 'rgba(8, 145, 178, 0.25)',
+          details: 'Ingress channel: Enterprise Prompt Payload with Identity Tokens',
+        },
+        {
+          id: 'station-2',
+          step: 2,
+          x: width * 0.38,
+          y: cy,
+          name: 'DLP NER Guard',
+          sub: 'Presidio + C# AST',
+          tag: 'SCANNING',
+          color: '#059669',
+          glow: 'rgba(5, 150, 105, 0.25)',
+          details: 'Inspection speed: <10ms • Aadhaar, SSN, Cards, PHI, OWASP LLM01 Gate',
+        },
+        {
+          id: 'station-3',
+          step: 3,
+          x: width * 0.63,
+          y: cy,
+          name: 'Cryptographic Vault',
+          sub: privacyMode === 'synthetic' ? '✨ Synthetic Shadows' : '🔒 Token Chamber',
+          tag: 'SURROGATES',
+          color: '#7c3aed',
+          glow: 'rgba(124, 58, 237, 0.25)',
+          details: 'Zero-Trust Storage: Deterministic Ephemeral TTL Vault & Surrogates',
+        },
+        {
+          id: 'station-4',
+          step: 4,
+          x: width * 0.88,
+          y: cy,
+          name: 'AI Cloud Upstream',
+          sub: targetModel.includes('Gemini') ? 'Google Gemini' : 'Groq Cloud',
+          tag: 'ZERO PII',
+          color: '#2563eb',
+          glow: 'rgba(37, 99, 235, 0.25)',
+          details: 'Sanitized egress: Zero customer PII or raw secrets transmitted',
+        },
+      ];
 
-      // Draw Main Connecting Bus Cables
+      // ==========================================
+      // 3. DUAL DATA HIGHWAY BUSES WITH GLOW
+      // ==========================================
+      const [s1, s2, s3, s4] = stations;
+
+      // Base Highway Cable Track (Thick backdrop)
       ctx.beginPath();
       ctx.moveTo(s1.x, s1.y);
-      ctx.bezierCurveTo((s1.x + s2.x) / 2, s1.y - 12, (s1.x + s2.x) / 2, s2.y + 12, s2.x, s2.y);
-      ctx.bezierCurveTo((s2.x + s3.x) / 2, s2.y - 12, (s2.x + s3.x) / 2, s3.y + 12, s3.x, s3.y);
-      ctx.bezierCurveTo((s3.x + s4.x) / 2, s3.y - 12, (s3.x + s4.x) / 2, s4.y + 12, s4.x, s4.y);
+      ctx.bezierCurveTo((s1.x + s2.x) / 2, s1.y - 18, (s1.x + s2.x) / 2, s2.y + 18, s2.x, s2.y);
+      ctx.bezierCurveTo((s2.x + s3.x) / 2, s2.y - 18, (s2.x + s3.x) / 2, s3.y + 18, s3.x, s3.y);
+      ctx.bezierCurveTo((s3.x + s4.x) / 2, s3.y - 18, (s3.x + s4.x) / 2, s4.y + 18, s4.x, s4.y);
       ctx.strokeStyle = '#e2e8f0';
-      ctx.lineWidth = 7;
+      ctx.lineWidth = 10;
       ctx.lineCap = 'round';
       ctx.stroke();
 
-      ctx.strokeStyle = trackGrad;
+      // Iridescent Inner Cable
+      const busGrad = ctx.createLinearGradient(s1.x, cy, s4.x, cy);
+      busGrad.addColorStop(0, '#06b6d4');
+      busGrad.addColorStop(0.35, '#10b981');
+      busGrad.addColorStop(0.68, '#8b5cf6');
+      busGrad.addColorStop(1, '#2563eb');
+
+      ctx.strokeStyle = busGrad;
       ctx.lineWidth = 3.5;
       ctx.stroke();
 
-      // Station 2: Active Sweeping Laser Scanner Beam (Presidio NER inspection)
-      scanLaserY += scanLaserDirection * (isTransiting ? 2.8 : 1.2);
-      if (scanLaserY > 26) scanLaserDirection = -1;
-      if (scanLaserY < -26) scanLaserDirection = 1;
-
-      ctx.beginPath();
-      ctx.moveTo(s2.x - 28, s2.y + scanLaserY);
-      ctx.lineTo(s2.x + 28, s2.y + scanLaserY);
-      ctx.strokeStyle = 'rgba(16, 185, 129, 0.8)';
-      ctx.lineWidth = 2;
-      ctx.shadowColor = '#10b981';
-      ctx.shadowBlur = 8;
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-
-      // Station 3: Rotating Cryptographic Vault Ring
+      // Animated Streaming Dashes along the bus
       ctx.save();
-      ctx.translate(s3.x, s3.y);
-      ctx.rotate(lockRotation);
       ctx.beginPath();
-      ctx.arc(0, 0, 26, 0, Math.PI * 2);
-      ctx.strokeStyle = isTransiting ? 'rgba(139, 92, 246, 0.7)' : 'rgba(139, 92, 246, 0.3)';
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([6, 6]);
+      ctx.moveTo(s1.x, s1.y);
+      ctx.bezierCurveTo((s1.x + s2.x) / 2, s1.y - 18, (s1.x + s2.x) / 2, s2.y + 18, s2.x, s2.y);
+      ctx.bezierCurveTo((s2.x + s3.x) / 2, s2.y - 18, (s2.x + s3.x) / 2, s3.y + 18, s3.x, s3.y);
+      ctx.bezierCurveTo((s3.x + s4.x) / 2, s3.y - 18, (s3.x + s4.x) / 2, s4.y + 18, s4.x, s4.y);
+      ctx.strokeStyle = isTransiting ? '#ffffff' : 'rgba(255, 255, 255, 0.7)';
+      ctx.lineWidth = 1.8;
+      ctx.setLineDash([8, 8]);
+      ctx.lineDashOffset = cableDashOffset;
       ctx.stroke();
       ctx.restore();
 
-      // Flowing 2D Particles along data paths
-      particles2D.forEach((p) => {
-        p.progress += p.speed * (isTransiting ? 2.6 : 1.0);
+      // ==========================================
+      // 4. FLOWING COMET-TAIL PARTICLES
+      // ==========================================
+      particles.forEach((p) => {
+        p.progress += p.speed * (isTransiting ? 2.8 : 1.0);
         if (p.progress > 1) p.progress = 0;
 
         const px = s1.x + (s4.x - s1.x) * p.progress;
-        const py = cy + Math.sin(p.progress * Math.PI * 4) * 8 + p.offsetY * 0.3;
+        const py = cy + Math.sin(p.progress * Math.PI * 4) * 10 + p.offsetY * 0.4;
 
+        // Comet Tail
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(px - p.tailLength * (isTransiting ? 1.5 : 1.0), py);
+        const tailGrad = ctx.createLinearGradient(px, py, px - p.tailLength, py);
+        tailGrad.addColorStop(0, p.color);
+        tailGrad.addColorStop(1, 'transparent');
+        ctx.strokeStyle = tailGrad;
+        ctx.lineWidth = p.size * 0.8;
+        ctx.stroke();
+
+        // Particle Head Glow
         ctx.beginPath();
         ctx.arc(px, py, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
+        ctx.fillStyle = '#ffffff';
         ctx.shadowColor = p.color;
-        ctx.shadowBlur = 6;
+        ctx.shadowBlur = 8;
         ctx.fill();
         ctx.shadowBlur = 0;
       });
 
-      // Draw 4 Station Nodes
-      stations.forEach((st, idx) => {
-        const stepNum = idx + 1;
-        const isActive = activeStep === stepNum || (isTransiting && activeStep >= stepNum);
+      // ==========================================
+      // 5. GRAPHICAL STATION POD RENDERING
+      // ==========================================
+      stations.forEach((st) => {
+        const isActive = activeStep === st.step || (isTransiting && activeStep >= st.step);
 
-        // Outer Glow Ring
+        // A. Pulsing Aura & Radar Rings
+        const auraRadius = 32 + (isActive ? Math.sin(pulsePhase) * 5 : 0);
+        const auraGrad = ctx.createRadialGradient(st.x, st.y, 10, st.x, st.y, auraRadius + 8);
+        auraGrad.addColorStop(0, st.glow);
+        auraGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = auraGrad;
         ctx.beginPath();
-        ctx.arc(st.x, st.y, 28 + (isActive ? Math.sin(pulsePhase) * 4 : 0), 0, Math.PI * 2);
-        ctx.fillStyle = isActive ? st.color + '22' : 'rgba(241, 245, 249, 0.8)';
+        ctx.arc(st.x, st.y, auraRadius + 8, 0, Math.PI * 2);
         ctx.fill();
+
+        // Outer Tech Ring with Notch Markers
+        ctx.beginPath();
+        ctx.arc(st.x, st.y, 28, 0, Math.PI * 2);
         ctx.strokeStyle = isActive ? st.color : '#cbd5e1';
         ctx.lineWidth = isActive ? 2.5 : 1.5;
         ctx.stroke();
 
-        // Station Body
+        // B. Station-Specific Graphics
+        if (st.id === 'station-2') {
+          // STATION 2: DLP Scanner Gear & Vertical Sweeping Laser
+          ctx.save();
+          ctx.translate(st.x, st.y);
+          ctx.rotate(gearAngle1);
+          ctx.beginPath();
+          ctx.arc(0, 0, 32, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([4, 6]);
+          ctx.stroke();
+          ctx.restore();
+
+          // Sweeping Laser Beam
+          scanLaserY += scanLaserDirection * (isTransiting ? 3.0 : 1.4);
+          if (scanLaserY > 26) scanLaserDirection = -1;
+          if (scanLaserY < -26) scanLaserDirection = 1;
+
+          ctx.beginPath();
+          ctx.moveTo(st.x - 30, st.y + scanLaserY);
+          ctx.lineTo(st.x + 30, st.y + scanLaserY);
+          ctx.strokeStyle = 'rgba(16, 185, 129, 0.9)';
+          ctx.lineWidth = 2.2;
+          ctx.shadowColor = '#10b981';
+          ctx.shadowBlur = 10;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+
+        if (st.id === 'station-3') {
+          // STATION 3: Cryptographic Vault Dual Rotating Rings
+          ctx.save();
+          ctx.translate(st.x, st.y);
+          ctx.rotate(gearAngle2);
+          ctx.beginPath();
+          ctx.arc(0, 0, 32, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(139, 92, 246, 0.45)';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([6, 5]);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        if (st.id === 'station-4') {
+          // STATION 4: Neural Synapses radiating outward
+          for (let a = 0; a < 6; a++) {
+            const rad = (a / 6) * Math.PI * 2 + pulsePhase * 0.5;
+            const sx = st.x + Math.cos(rad) * 32;
+            const sy = st.y + Math.sin(rad) * 32;
+            ctx.beginPath();
+            ctx.arc(sx, sy, 1.8, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(37, 99, 235, 0.6)';
+            ctx.fill();
+          }
+        }
+
+        // C. Station Core Body (Crisp white with colored glow)
         ctx.beginPath();
-        ctx.arc(st.x, st.y, 20, 0, Math.PI * 2);
+        ctx.arc(st.x, st.y, 22, 0, Math.PI * 2);
         ctx.fillStyle = isActive ? st.color : '#ffffff';
         ctx.fill();
         ctx.strokeStyle = isActive ? '#ffffff' : '#94a3b8';
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Station Step Number / Icon
+        // D. Step Number Icon
         ctx.font = 'bold 12px Inter, system-ui, sans-serif';
-        ctx.fillStyle = isActive ? '#ffffff' : '#475569';
+        ctx.fillStyle = isActive ? '#ffffff' : '#334155';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(st.icon, st.x, st.y);
+        ctx.fillText(st.step.toString(), st.x, st.y);
 
-        // Text Label
-        ctx.font = 'bold 11px Inter, system-ui, sans-serif';
-        ctx.fillStyle = '#0f172a';
+        // E. Top Tag Badge
+        ctx.font = 'bold 9px monospace';
+        ctx.fillStyle = st.color;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'alphabetic';
-        ctx.fillText(st.label, st.x, st.y + 42);
+        ctx.fillText(st.tag, st.x, st.y - 34);
 
-        // Subtext
+        // F. Bottom Label & Subtitle
+        ctx.font = 'bold 11px Inter, system-ui, sans-serif';
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText(st.name, st.x, st.y + 44);
+
         ctx.font = '500 10px monospace';
         ctx.fillStyle = '#64748b';
-        ctx.fillText(st.sub, st.x, st.y + 56);
+        ctx.fillText(st.sub, st.x, st.y + 58);
       });
 
       ctx.restore();
@@ -197,37 +352,42 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
   }, [isTransiting, privacyMode, targetModel, activeStep]);
 
   return (
-    <div className="relative rounded-2xl bg-white border border-slate-200 p-4 shadow-sm overflow-hidden flex flex-col md:flex-row items-center justify-between gap-4">
-      {/* 2D Cybernetic Flow Canvas */}
+    <div className="relative rounded-2xl bg-white border border-slate-200 p-4 shadow-sm overflow-hidden flex flex-col md:flex-row items-center justify-between gap-4 tech-grid-bg">
+      {/* 2D Cybernetic Flow Canvas Area */}
       <div
-        className="relative w-full md:w-3/5 h-64 sm:h-72 flex items-center justify-center bg-radial from-slate-50 to-white rounded-xl"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        className="relative w-full md:w-3/5 h-64 sm:h-72 flex items-center justify-center bg-white/70 backdrop-blur-xs rounded-xl border border-slate-200/80 overflow-hidden"
       >
         <canvas
           ref={canvasRef}
           className="w-full h-full block"
         />
 
-        {/* 2D Pipeline Indicator Badge */}
-        <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200 text-xs font-bold text-slate-800 shadow-xs">
-          <Zap className="w-3.5 h-3.5 text-cyan-600" />
-          <span>2D Cybernetic Flow Pipeline</span>
-        </div>
-
-        {/* Live Status Hint */}
-        <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-md border border-slate-200 text-[11px] font-mono text-slate-600 shadow-xs flex items-center gap-1.5">
-          <Activity className="w-3.5 h-3.5 text-cyan-600 animate-pulse" />
-          <span>Real-Time Egress Pipeline • Continuous Particle Streams</span>
+        {/* Top Graphic Header Badge */}
+        <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-2 px-3 py-1 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200 text-xs font-bold text-slate-800 shadow-xs">
+          <Zap className="w-3.5 h-3.5 text-cyan-600 animate-pulse" />
+          <span>2D Cybernetic Flow Highway</span>
+          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200">
+            60 FPS Engine
+          </span>
         </div>
 
         {/* Real-time Transit Burst Badge */}
         {isTransiting && (
-          <div className="absolute top-2 right-2 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-300 text-cyan-800 text-xs font-bold font-mono animate-pulse shadow-sm flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-cyan-600 fill-cyan-600" />
+          <div className="absolute top-2.5 right-2.5 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-300 text-cyan-800 text-xs font-bold font-mono animate-pulse shadow-sm flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-600 fill-cyan-600" />
             <span>Transit Burst Active</span>
           </div>
         )}
+
+        {/* Bottom Status Ticker */}
+        <div className="absolute bottom-2 left-2 right-2 px-3 py-1 rounded-lg bg-white/90 backdrop-blur-md border border-slate-200/80 text-[11px] font-mono text-slate-600 shadow-xs flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+            <span className="font-semibold text-slate-800">Pipeline Online:</span>
+            <span>4 Interconnected Security Pods Active</span>
+          </div>
+          <span className="text-slate-400 hidden sm:inline">Comet-Tail Particle Bus</span>
+        </div>
       </div>
 
       {/* Telemetry & Cryptographic State Summary */}
@@ -237,7 +397,7 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
             <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5 uppercase tracking-wider">
               <ShieldCheck className="w-4 h-4 text-emerald-600" /> 2027 DLP Cryptographic Core
             </span>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 animate-pulse">
               Active Isolation
             </span>
           </div>
@@ -249,7 +409,7 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-2 gap-2.5">
-          <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-2.5">
+          <div className="rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5">
             <span className="text-[10px] uppercase font-mono text-slate-500 block">DLP Mode</span>
             <span className="text-xs font-bold text-slate-900 flex items-center gap-1 mt-0.5">
               {privacyMode === 'synthetic' ? (
@@ -264,14 +424,14 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
             </span>
           </div>
 
-          <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-2.5">
+          <div className="rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5">
             <span className="text-[10px] uppercase font-mono text-slate-500 block">Upstream AI</span>
             <span className="text-xs font-bold text-slate-900 truncate block mt-0.5" title={targetModel}>
               {targetModel.includes('Gemini') ? 'Google Gemini' : 'Groq Cloud'}
             </span>
           </div>
 
-          <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-2.5">
+          <div className="rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5">
             <span className="text-[10px] uppercase font-mono text-slate-500 block">Pipeline Status</span>
             <span
               className={`text-xs font-bold flex items-center gap-1 mt-0.5 ${
@@ -293,7 +453,7 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
             </span>
           </div>
 
-          <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-2.5">
+          <div className="rounded-xl bg-slate-50/80 border border-slate-200/80 p-2.5">
             <span className="text-[10px] uppercase font-mono text-slate-500 block">Protected Items</span>
             <span className="text-xs font-bold text-emerald-700 mt-0.5 block">
               {detectedCount > 0 ? `${detectedCount} Encrypted` : '100% Shielded'}
@@ -302,7 +462,7 @@ export const ThreeDimensionalSecurityVault: React.FC<SecurityVisualizerProps> = 
         </div>
 
         {/* Verification Status */}
-        <div className="rounded-xl bg-emerald-50/80 border border-emerald-200/70 p-2 flex items-center gap-2 text-xs text-emerald-900">
+        <div className="rounded-xl bg-emerald-50/80 border border-emerald-200/70 p-2.5 flex items-center gap-2 text-xs text-emerald-900 shadow-2xs">
           <Lock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
           <span className="text-[11px] font-medium leading-tight">
             2D Interactive Stream • Zero Raw PII Transmitted to External Models
