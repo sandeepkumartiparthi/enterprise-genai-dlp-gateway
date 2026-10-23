@@ -1,0 +1,7 @@
+{
+  "targetPlatform": "SPLUNK",
+  "eventType": "ADVERSARIAL_THREAT_INTERCEPTED",
+  "severity": "CRITICAL",
+  "userEmail": "secops.lead@corp.acme.io",
+  "department": "SecOps RedTeam"
+}
